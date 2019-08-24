@@ -20,7 +20,9 @@
       "launchBrowser": true,
       "launchUrl": "http://localhost:21021",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPNETCORE_HOSTINGSTARTUPASSEMBLIES": "SkyAPM.Agent.AspNetCore",
+        "SKYWALKING__SERVICENAME": "DotNetCore.ElementAdmin.Web.Host"
       },
       "applicationUrl": "http://localhost:21021/"
     }
