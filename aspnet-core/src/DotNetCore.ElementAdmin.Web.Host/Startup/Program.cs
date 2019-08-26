@@ -16,11 +16,12 @@ namespace DotNetCore.ElementAdmin.Web.Host.Startup
         public static IWebHost BuildWebHost(string[] args)
         {
             var logger = new LoggerConfiguration()
-                               .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri("http://localhost:9222/"))
-                               {
-                                   AutoRegisterTemplate = true
-                               })
-                               .CreateLogger();
+                            .WriteTo.ColoredConsole()
+                            .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri("http://localhost:9222/"))
+                            {
+                                AutoRegisterTemplate = true
+                            })
+                            .CreateLogger();
 
             return WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>()

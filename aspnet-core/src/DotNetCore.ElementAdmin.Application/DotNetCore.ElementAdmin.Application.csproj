@@ -13,4 +13,7 @@
   <ItemGroup>
     <ProjectReference Include="..\DotNetCore.ElementAdmin.Core\DotNetCore.ElementAdmin.Core.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+  </ItemGroup>
 </Project>

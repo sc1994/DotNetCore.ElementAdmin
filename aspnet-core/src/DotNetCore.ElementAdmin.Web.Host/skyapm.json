@@ -11,7 +11,7 @@
     },
     "Logging": {
       "Level": "Information",
-      "FilePath": "log/skyapm-{Date}.log"
+      "FilePath": "App_Data/log/skyapm-{Date}.log"
     },
     "Transport": {
       "Interval": 3000,

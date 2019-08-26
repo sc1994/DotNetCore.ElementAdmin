@@ -56,6 +56,7 @@
 <script>
 import path from "path";
 import { deepClone } from "@/utils";
+import { asyncRoutes, constantRoutes } from "@/router";
 import {
   getRoutes,
   getRoles,
@@ -75,25 +76,34 @@ export default {
   data() {
     return {
       role: Object.assign({}, defaultRole),
-      routes: [],
+      routes: deepClone([...constantRoutes, ...asyncRoutes]),
+      // asyncRoutes: ,
       rolesList: [],
       dialogVisible: false,
       dialogType: "new",
       checkStrictly: false,
       defaultProps: {
         children: "children",
-        label: "title"
+        label: "name"
       }
     };
   },
   computed: {
     routesData() {
-      return this.routes;
+      return this.routes
+        .map(x => {
+          console.log(x);
+          if (x.hidden) return null;
+          if (!x.meta)
+            return x.children[0];
+          return x;
+        })
+        .filter(x => x);
     }
   },
   created() {
     // Mock: get all routes and roles list from server
-    // this.getRoutes()
+    // this.getRoutes() TODO: 暂时注释掉
     this.getRoles();
   },
   methods: {
@@ -106,8 +116,10 @@ export default {
       const { result } = await getRoles();
       this.rolesList = result.items.map(x => {
         return {
+          key: x.id,
           name: x.name,
-          children: [] // TODO: 子项?
+          description: x.description || "-",
+          routes: [] // TODO: 路由
         };
       });
     },

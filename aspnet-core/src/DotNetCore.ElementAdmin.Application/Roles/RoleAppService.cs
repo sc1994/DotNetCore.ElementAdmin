@@ -14,6 +14,7 @@ using DotNetCore.ElementAdmin.Authorization.Users;
 using DotNetCore.ElementAdmin.Roles.Dto;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace DotNetCore.ElementAdmin.Roles
 {
@@ -22,12 +23,19 @@ namespace DotNetCore.ElementAdmin.Roles
     {
         private readonly RoleManager _roleManager;
         private readonly UserManager _userManager;
+        private readonly ILogger<RoleAppService> _log;
 
-        public RoleAppService(IRepository<Role> repository, RoleManager roleManager, UserManager userManager)
+        public RoleAppService(
+            IRepository<Role> repository,
+            RoleManager roleManager,
+            UserManager userManager,
+            ILogger<RoleAppService> log
+        )
             : base(repository)
         {
             _roleManager = roleManager;
             _userManager = userManager;
+            _log = log;
         }
 
         public override async Task<RoleDto> Create(CreateRoleDto input)
@@ -99,8 +107,12 @@ namespace DotNetCore.ElementAdmin.Roles
 
         public Task<ListResultDto<PermissionDto>> GetAllPermissions()
         {
+            _log.LogTrace("Begin-GetAllPermissions");
+            _log.LogInformation("Begin-GetAllPermissions");
             var permissions = PermissionManager.GetAllPermissions();
 
+            _log.LogTrace("End-GetAllPermissions");
+            _log.LogInformation("End-GetAllPermissions");
             return Task.FromResult(new ListResultDto<PermissionDto>(
                 ObjectMapper.Map<List<PermissionDto>>(permissions).OrderBy(p => p.DisplayName).ToList()
             ));
