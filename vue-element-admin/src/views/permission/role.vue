@@ -19,9 +19,10 @@
         </template>
       </el-table-column>
     </el-table>
+    <el-pagination background layout="total, prev, pager, next" :total="totalCount"></el-pagination>
 
     <el-dialog :visible.sync="dialogVisible" :title="dialogType==='edit'?'Edit Role':'New Role'">
-      <el-form :model="role" label-width="80px" label-position="left">
+      <el-form :model="role" label-width="100px" label-position="left">
         <el-form-item label="Name">
           <el-input v-model="role.name" placeholder="Role Name" />
         </el-form-item>
@@ -33,6 +34,20 @@
             placeholder="Role Description"
           />
         </el-form-item>
+        <el-form-item label="Permissions">
+          <el-checkbox
+            :indeterminate="isPermissionsIndeterminate"
+            v-model="isPermissionsAll"
+            @change="handlePermissionsCheckAllChange"
+          >All</el-checkbox>
+          <el-checkbox-group v-model="checkedPermissions" @change="handlePermissionsCheckedChange">
+            <el-checkbox
+              v-for="item in allPermissions"
+              :label="item.name"
+              :key="item.name"
+            >{{item.name}}</el-checkbox>
+          </el-checkbox-group>
+        </el-form-item>
         <el-form-item label="Menus">
           <el-tree
             ref="tree"
@@ -40,7 +55,7 @@
             :data="routesData"
             :props="defaultProps"
             show-checkbox
-            node-key="path"
+            node-key="key"
             class="permission-tree"
           />
         </el-form-item>
@@ -62,7 +77,9 @@ import {
   getRoles,
   addRole,
   deleteRole,
-  updateRole
+  updateRole,
+  getAllPermissions,
+  getRoleForEdit
 } from "@/api/role";
 
 const defaultRole = {
@@ -77,26 +94,36 @@ export default {
     return {
       role: Object.assign({}, defaultRole),
       routes: deepClone([...constantRoutes, ...asyncRoutes]),
-      // asyncRoutes: ,
       rolesList: [],
       dialogVisible: false,
       dialogType: "new",
       checkStrictly: false,
+      totalCount: 0,
       defaultProps: {
         children: "children",
-        label: "name"
-      }
+        label: this.treeSelectLabel
+      },
+      allPermissions: [],
+      isPermissionsIndeterminate: false,
+      isPermissionsAll: false,
+      checkedPermissions: []
     };
   },
   computed: {
     routesData() {
+      let map = x => {
+        return {
+          meta: x.meta,
+          children: x.children,
+          key: `${x.path}_${x.name}`
+        };
+      };
       return this.routes
         .map(x => {
-          console.log(x);
           if (x.hidden) return null;
-          if (!x.meta)
-            return x.children[0];
-          return x;
+          if (!x.meta && x.children && x.children.length > 0)
+            return map(x.children[0]);
+          return map(x);
         })
         .filter(x => x);
     }
@@ -104,7 +131,9 @@ export default {
   created() {
     // Mock: get all routes and roles list from server
     // this.getRoutes() TODO: 暂时注释掉
+
     this.getRoles();
+    this.getAllPermissions();
   },
   methods: {
     async getRoutes() {
@@ -114,16 +143,21 @@ export default {
     },
     async getRoles() {
       const { result } = await getRoles();
+      this.totalCount = result.totalCount;
       this.rolesList = result.items.map(x => {
         return {
-          key: x.id,
+          id: x.id,
+          key: x.name,
           name: x.name,
           description: x.description || "-",
           routes: [] // TODO: 路由
         };
       });
     },
-
+    async getAllPermissions() {
+      const { result } = await getAllPermissions();
+      this.allPermissions = result.items;
+    },
     // Reshape the routes structure so that it looks the same as the sidebar
     generateRoutes(routes, basePath = "/") {
       const res = [];
@@ -177,14 +211,14 @@ export default {
       this.dialogType = "new";
       this.dialogVisible = true;
     },
-    handleEdit(scope) {
+    async handleEdit(scope) {
       this.dialogType = "edit";
       this.dialogVisible = true;
       this.checkStrictly = true;
-      this.role = deepClone(scope.row);
+      this.role = await getRoleForEdit(scope.row.id);
       this.$nextTick(() => {
-        const routes = this.generateRoutes(this.role.routes);
-        this.$refs.tree.setCheckedNodes(this.generateArr(routes));
+        // const routes = this.generateRoutes(this.role.routes); TODO:
+        // this.$refs.tree.setCheckedNodes(this.generateArr(routes));TODO:
         // set checked state of a node not affects its father and child nodes
         this.checkStrictly = false;
       });
@@ -267,6 +301,7 @@ export default {
           `,
         type: "success"
       });
+      handleCheckAllChange();
     },
     // reference: src/view/layout/components/Sidebar/SidebarItem.vue
     onlyOneShowingChild(children = [], parent) {
@@ -287,6 +322,20 @@ export default {
       }
 
       return false;
+    },
+    // 树控件选择外显标题
+    treeSelectLabel(data, node) {
+      return data.meta.title;
+    },
+    handlePermissionsCheckAllChange(val) {
+      this.checkedPermissions = val ? this.allPermissions.map(x => x.name) : [];
+      this.isPermissionsIndeterminate = false;
+    },
+    handlePermissionsCheckedChange(value) {
+      let checkedCount = value.length;
+      this.isPermissionsAll = checkedCount === this.allPermissions.length;
+      this.isPermissionsIndeterminate =
+        checkedCount > 0 && checkedCount < this.allPermissions.length;
     }
   }
 };

@@ -36,3 +36,17 @@ export function deleteRole(id) {
     method: 'delete'
   })
 }
+
+export function getAllPermissions() {
+  return request({
+    url: "/services/app/Role/GetAllPermissions",
+    method: "get"
+  })
+}
+
+export function getRoleForEdit(id) {
+  return request({
+    url: `/services/app/Role/GetRoleForEdit?Id=${id}`,
+    method: "get"
+  })
+}

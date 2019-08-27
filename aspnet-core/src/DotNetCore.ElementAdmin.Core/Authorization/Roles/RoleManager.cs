@@ -35,8 +35,8 @@ namespace DotNetCore.ElementAdmin.Authorization.Roles
                   cacheManager,
                   unitOfWorkManager,
                   roleManagementConfig,
-                organizationUnitRepository,
-                organizationUnitRoleRepository)
+                  organizationUnitRepository,
+                  organizationUnitRoleRepository)
         {
         }
     }

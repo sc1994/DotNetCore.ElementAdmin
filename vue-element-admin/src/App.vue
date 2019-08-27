@@ -6,6 +6,14 @@
 
 <script>
 export default {
-  name: 'App'
-}
+  name: "App"
+};
 </script>
+
+
+<style >
+.el-pagination {
+  padding: 10px;
+  text-align: end;
+}
+</style>

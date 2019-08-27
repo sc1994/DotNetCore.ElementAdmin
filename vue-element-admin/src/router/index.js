@@ -7,10 +7,7 @@ Vue.use(Router)
 import Layout from '@/layout'
 
 /* Router Modules */
-import componentsRouter from './modules/components'
-import chartsRouter from './modules/charts'
-import tableRouter from './modules/table'
-import nestedRouter from './modules/nested'
+import developsRouter from './modules/develops'
 
 /**
  * Note: sub-menu only appear when route children.length >= 1
@@ -185,55 +182,7 @@ export const asyncRoutes = [
   },
 
   /** when your routing map is too long, you can split it into small modules **/
-  componentsRouter,
-  chartsRouter,
-  nestedRouter,
-  tableRouter,
-
-  {
-    path: '/example',
-    component: Layout,
-    redirect: '/example/list',
-    name: 'Example',
-    meta: {
-      title: 'Example',
-      icon: 'example'
-    },
-    children: [
-      {
-        path: 'create',
-        component: () => import('@/views/example/create'),
-        name: 'CreateArticle',
-        meta: { title: 'Create Article', icon: 'edit' }
-      },
-      {
-        path: 'edit/:id(\\d+)',
-        component: () => import('@/views/example/edit'),
-        name: 'EditArticle',
-        meta: { title: 'Edit Article', noCache: true, activeMenu: '/example/list' },
-        hidden: true
-      },
-      {
-        path: 'list',
-        component: () => import('@/views/example/list'),
-        name: 'ArticleList',
-        meta: { title: 'Article List', icon: 'list' }
-      }
-    ]
-  },
-
-  {
-    path: '/tab',
-    component: Layout,
-    children: [
-      {
-        path: 'index',
-        component: () => import('@/views/tab/index'),
-        name: 'Tab',
-        meta: { title: 'Tab', icon: 'tab' }
-      }
-    ]
-  },
+  ...developsRouter,
 
   {
     path: '/error',
