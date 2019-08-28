@@ -3,8 +3,8 @@ using DotNetCore.ElementAdmin.Application.Menus.Dto;
 
 namespace DotNetCore.ElementAdmin.Application.Menus
 {
-    public interface IMenuAppService : IAsyncCrudAppService<MenuDto, long, GetAllMenuDto, MenuDto, MenuDto>
+    public interface IMenuAppService : IAsyncCrudAppService<MenuDto, long, PagedMenuResultRequestDto, MenuDto, MenuDto>
     {
-
+        
     }
 }

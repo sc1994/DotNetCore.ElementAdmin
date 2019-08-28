@@ -13,7 +13,5 @@ namespace DotNetCore.ElementAdmin.Application.Menus.Dto
         public string Key { get; set; }
 
         public int RoleId { get; set; }
-
-        public int? TenantId { get; set; }
     }
 }

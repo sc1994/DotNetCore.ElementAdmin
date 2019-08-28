@@ -1,3 +1,5 @@
+using System;
+using System.Threading.Tasks;
 using Abp.Domain.Repositories;
 using Abp.Domain.Services;
 
@@ -10,6 +12,11 @@ namespace DotNetCore.ElementAdmin.Authorization.Menus
         public MenuManager(IRepository<Menu, long> menuRepository)
         {
             menuRepository = _menuRepository;
+        }
+
+        public Task InsertBatchAsync()
+        {
+            throw new NotImplementedException();
         }
     }
 }

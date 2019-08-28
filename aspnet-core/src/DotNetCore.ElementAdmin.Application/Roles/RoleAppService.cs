@@ -16,6 +16,7 @@ using DotNetCore.ElementAdmin.Roles.Dto;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using DotNetCore.ElementAdmin.Authorization.Menus;
 
 namespace DotNetCore.ElementAdmin.Roles
 {
@@ -24,18 +25,24 @@ namespace DotNetCore.ElementAdmin.Roles
     {
         private readonly RoleManager _roleManager;
         private readonly UserManager _userManager;
+        private readonly IRepository<Menu, long> _menuRepository;
+        private readonly MenuManager _menuManager;
         private readonly ILogger<RoleAppService> _log;
 
         public RoleAppService(
             IRepository<Role> repository,
             RoleManager roleManager,
             UserManager userManager,
+            IRepository<Menu, long> menuRepository,
+            MenuManager menuManager,
             ILogger<RoleAppService> log
         )
             : base(repository)
         {
             _roleManager = roleManager;
             _userManager = userManager;
+            _menuRepository = menuRepository;
+            _menuManager = menuManager;
             _log = log;
         }
 
@@ -146,6 +153,7 @@ namespace DotNetCore.ElementAdmin.Roles
         {
             var permissions = PermissionManager.GetAllPermissions();
             var role = await _roleManager.GetRoleByIdAsync(input.Id);
+            // var menuKeys = role.Menus;
             var grantedPermissions = (await _roleManager.GetGrantedPermissionsAsync(role)).ToArray();
             var roleEditDto = ObjectMapper.Map<RoleEditDto>(role);
 
@@ -153,7 +161,8 @@ namespace DotNetCore.ElementAdmin.Roles
             {
                 Role = roleEditDto,
                 Permissions = ObjectMapper.Map<List<FlatPermissionDto>>(permissions).OrderBy(p => p.DisplayName).ToList(),
-                GrantedPermissionNames = grantedPermissions.Select(p => p.Name).ToList()
+                GrantedPermissionNames = grantedPermissions.Select(p => p.Name).ToList(),
+                // GrantedMenuNames = menuKeys.ToList()
             };
         }
     }

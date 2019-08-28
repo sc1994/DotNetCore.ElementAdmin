@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Abp.Authorization.Roles;
 using DotNetCore.ElementAdmin.Authorization.Menus;
 using DotNetCore.ElementAdmin.Authorization.Users;
@@ -10,10 +12,12 @@ namespace DotNetCore.ElementAdmin.Authorization.Roles
     {
         public const int MaxDescriptionLength = 5000;
 
-        public DbSet<Menu> Menus { get; set; }
+        [ForeignKey("RoleId")]
+        public virtual DbSet<Menu> Menus { get; set; }
 
         public Role()
         {
+            // Menu = 
         }
 
         public Role(int? tenantId, string displayName)
