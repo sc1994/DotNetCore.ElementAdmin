@@ -40,9 +40,9 @@
             v-model="isPermissionsAll"
             @change="handlePermissionsCheckAllChange"
           >All</el-checkbox>
-          <el-checkbox-group v-model="checkedPermissions" @change="handlePermissionsCheckedChange">
+          <el-checkbox-group v-model="role.grantedPermissionNames">
             <el-checkbox
-              v-for="item in allPermissions"
+              v-for="item in role.permissions"
               :label="item.name"
               :key="item.name"
             >{{item.name}}</el-checkbox>
@@ -78,7 +78,6 @@ import {
   addRole,
   deleteRole,
   updateRole,
-  getAllPermissions,
   getRoleForEdit
 } from "@/api/role";
 
@@ -103,10 +102,8 @@ export default {
         children: "children",
         label: this.treeSelectLabel
       },
-      allPermissions: [],
       isPermissionsIndeterminate: false,
-      isPermissionsAll: false,
-      checkedPermissions: []
+      isPermissionsAll: false
     };
   },
   computed: {
@@ -133,9 +130,19 @@ export default {
     // this.getRoutes() TODO: 暂时注释掉
 
     this.getRoles();
-    this.getAllPermissions();
   },
   methods: {
+    mapToRole(source) {
+      return {
+        id: source.id,
+        key: source.name,
+        name: source.name,
+        description: source.description || "NULL PLACEHOLDERS !",
+        routes: [], // TODO: 路由
+        grantedPermissionNames: source.grantedPermissionNames || [],
+        permissions: source.permissions || []
+      };
+    },
     async getRoutes() {
       const res = await getRoutes();
       this.serviceRoutes = res.data;
@@ -145,18 +152,8 @@ export default {
       const { result } = await getRoles();
       this.totalCount = result.totalCount;
       this.rolesList = result.items.map(x => {
-        return {
-          id: x.id,
-          key: x.name,
-          name: x.name,
-          description: x.description || "-",
-          routes: [] // TODO: 路由
-        };
+        return this.mapToRole(x);
       });
-    },
-    async getAllPermissions() {
-      const { result } = await getAllPermissions();
-      this.allPermissions = result.items;
     },
     // Reshape the routes structure so that it looks the same as the sidebar
     generateRoutes(routes, basePath = "/") {
@@ -215,7 +212,12 @@ export default {
       this.dialogType = "edit";
       this.dialogVisible = true;
       this.checkStrictly = true;
-      this.role = await getRoleForEdit(scope.row.id);
+      let { result } = await getRoleForEdit(scope.row.id);
+      this.role = this.mapToRole({
+        ...result.role,
+        permissions: result.permissions,
+        grantedPermissionNames: result.grantedPermissionNames
+      });
       this.$nextTick(() => {
         // const routes = this.generateRoutes(this.role.routes); TODO:
         // this.$refs.tree.setCheckedNodes(this.generateArr(routes));TODO:
@@ -328,14 +330,18 @@ export default {
       return data.meta.title;
     },
     handlePermissionsCheckAllChange(val) {
-      this.checkedPermissions = val ? this.allPermissions.map(x => x.name) : [];
+      this.role.grantedPermissionNames = val
+        ? this.role.permissions.map(x => x.name)
+        : [];
       this.isPermissionsIndeterminate = false;
-    },
-    handlePermissionsCheckedChange(value) {
+    }
+  },
+  watch: {
+    "role.grantedPermissionNames"(value) {
       let checkedCount = value.length;
-      this.isPermissionsAll = checkedCount === this.allPermissions.length;
+      this.isPermissionsAll = checkedCount === this.role.permissions.length;
       this.isPermissionsIndeterminate =
-        checkedCount > 0 && checkedCount < this.allPermissions.length;
+        checkedCount > 0 && checkedCount < this.role.permissions.length;
     }
   }
 };

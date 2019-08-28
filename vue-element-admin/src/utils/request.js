@@ -53,7 +53,7 @@ service.interceptors.response.use(
     // if the custom code is not 20000, it is judged as an error.
     if (!res.success) {
       Message({
-        message: res.error || 'Error',
+        message: res.error.message || 'Error',
         type: 'error',
         duration: 5 * 1000
       })
@@ -71,7 +71,7 @@ service.interceptors.response.use(
       //     })
       //   })
       // } // TODO: 重新登录逻辑
-      return Promise.reject(new Error(res.error || 'Error'))
+      return Promise.reject(new Error(res.error.message || 'Error'))
     } else {
       return res
     }
