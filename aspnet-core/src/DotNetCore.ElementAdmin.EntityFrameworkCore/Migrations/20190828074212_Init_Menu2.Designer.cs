@@ -4,14 +4,16 @@ using DotNetCore.ElementAdmin.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DotNetCore.ElementAdmin.Migrations
 {
     [DbContext(typeof(ElementAdminDbContext))]
-    partial class ElementAdminDbContextModelSnapshot : ModelSnapshot
+    [Migration("20190828074212_Init_Menu2")]
+    partial class Init_Menu2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -878,7 +880,7 @@ namespace DotNetCore.ElementAdmin.Migrations
                     b.ToTable("AbpOrganizationUnitRoles");
                 });
 
-            modelBuilder.Entity("DotNetCore.ElementAdmin.Authorization.Menus.Menu", b =>
+            modelBuilder.Entity("DotNetCore.ElementAdmin.Authorization.Menu.Menu", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -894,20 +896,15 @@ namespace DotNetCore.ElementAdmin.Migrations
 
                     b.Property<bool>("IsDeleted");
 
-                    b.Property<string>("Key")
-                        .IsRequired();
+                    b.Property<string>("Key");
 
                     b.Property<DateTime?>("LastModificationTime");
 
                     b.Property<long?>("LastModifierUserId");
 
-                    b.Property<int>("RoleId");
-
                     b.Property<int?>("TenantId");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("RoleId");
 
                     b.ToTable("Menus");
                 });
@@ -1236,14 +1233,6 @@ namespace DotNetCore.ElementAdmin.Migrations
                     b.HasOne("Abp.Organizations.OrganizationUnit", "Parent")
                         .WithMany("Children")
                         .HasForeignKey("ParentId");
-                });
-
-            modelBuilder.Entity("DotNetCore.ElementAdmin.Authorization.Menus.Menu", b =>
-                {
-                    b.HasOne("DotNetCore.ElementAdmin.Authorization.Roles.Role")
-                        .WithMany("Menus")
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("DotNetCore.ElementAdmin.Authorization.Roles.Role", b =>

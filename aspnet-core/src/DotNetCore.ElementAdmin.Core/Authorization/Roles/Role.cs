@@ -1,12 +1,16 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Abp.Authorization.Roles;
+using DotNetCore.ElementAdmin.Authorization.Menus;
 using DotNetCore.ElementAdmin.Authorization.Users;
+using Microsoft.EntityFrameworkCore;
 
 namespace DotNetCore.ElementAdmin.Authorization.Roles
 {
     public class Role : AbpRole<User>
     {
         public const int MaxDescriptionLength = 5000;
+
+        public DbSet<Menu> Menus { get; set; }
 
         public Role()
         {
@@ -23,6 +27,6 @@ namespace DotNetCore.ElementAdmin.Authorization.Roles
         }
 
         [StringLength(MaxDescriptionLength)]
-        public string Description {get; set;}
+        public string Description { get; set; }
     }
 }

@@ -4,14 +4,16 @@ using DotNetCore.ElementAdmin.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DotNetCore.ElementAdmin.Migrations
 {
     [DbContext(typeof(ElementAdminDbContext))]
-    partial class ElementAdminDbContextModelSnapshot : ModelSnapshot
+    [Migration("20190828091629_Init_Menu4")]
+    partial class Init_Menu4
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -905,9 +907,11 @@ namespace DotNetCore.ElementAdmin.Migrations
 
                     b.Property<int?>("TenantId");
 
+                    b.Property<long?>("UserId");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("RoleId");
+                    b.HasIndex("UserId");
 
                     b.ToTable("Menus");
                 });
@@ -1240,10 +1244,9 @@ namespace DotNetCore.ElementAdmin.Migrations
 
             modelBuilder.Entity("DotNetCore.ElementAdmin.Authorization.Menus.Menu", b =>
                 {
-                    b.HasOne("DotNetCore.ElementAdmin.Authorization.Roles.Role")
+                    b.HasOne("DotNetCore.ElementAdmin.Authorization.Users.User")
                         .WithMany("Menus")
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("UserId");
                 });
 
             modelBuilder.Entity("DotNetCore.ElementAdmin.Authorization.Roles.Role", b =>

@@ -1,7 +1,7 @@
 using Abp.Application.Services;
 using Abp.Domain.Repositories;
 using DotNetCore.ElementAdmin.Application.Menus.Dto;
-using DotNetCore.ElementAdmin.EntityFrameworkCore.EntityFrameworkCore.Repositories.RoleExtendRepository;
+using DotNetCore.ElementAdmin.Authorization.Menus;
 
 namespace DotNetCore.ElementAdmin.Application.Menus
 {
@@ -9,6 +9,7 @@ namespace DotNetCore.ElementAdmin.Application.Menus
     {
         public MenuAppService(IRepository<Menu, long> repository) : base(repository)
         {
+            
         }
     }
 }

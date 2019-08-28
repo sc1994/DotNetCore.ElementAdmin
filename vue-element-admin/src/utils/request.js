@@ -21,6 +21,7 @@ service.interceptors.request.use(
     // do something before request is sent
 
     if (store.getters.token) {
+      debugger
       // let each request carry token
       // ['X-Token'] is a custom headers key
       // please modify it according to the actual situation
