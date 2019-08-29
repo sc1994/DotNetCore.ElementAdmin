@@ -4,14 +4,16 @@ using DotNetCore.ElementAdmin.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DotNetCore.ElementAdmin.Migrations
 {
     [DbContext(typeof(ElementAdminDbContext))]
-    partial class ElementAdminDbContextModelSnapshot : ModelSnapshot
+    [Migration("20190828112849_Init_20190828192844_efdemo")]
+    partial class Init_20190828192844_efdemo
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -892,8 +894,6 @@ namespace DotNetCore.ElementAdmin.Migrations
 
                     b.Property<DateTime?>("DeletionTime");
 
-                    b.Property<long>("EfDemoId");
-
                     b.Property<bool>("IsDeleted");
 
                     b.Property<string>("Key")
@@ -1066,31 +1066,6 @@ namespace DotNetCore.ElementAdmin.Migrations
                     b.HasIndex("TenantId", "NormalizedUserName");
 
                     b.ToTable("AbpUsers");
-                });
-
-            modelBuilder.Entity("DotNetCore.ElementAdmin.Core.EfDemos.EfDemo", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<DateTime>("CreationTime");
-
-                    b.Property<long?>("CreatorUserId");
-
-                    b.Property<long?>("DeleterUserId");
-
-                    b.Property<DateTime?>("DeletionTime");
-
-                    b.Property<bool>("IsDeleted");
-
-                    b.Property<DateTime?>("LastModificationTime");
-
-                    b.Property<long?>("LastModifierUserId");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("EfDemos");
                 });
 
             modelBuilder.Entity("DotNetCore.ElementAdmin.MultiTenancy.Tenant", b =>

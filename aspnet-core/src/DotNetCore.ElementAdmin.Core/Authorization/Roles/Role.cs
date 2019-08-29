@@ -12,12 +12,11 @@ namespace DotNetCore.ElementAdmin.Authorization.Roles
     {
         public const int MaxDescriptionLength = 5000;
 
-        [ForeignKey("RoleId")]
-        public virtual DbSet<Menu> Menus { get; set; }
+        public List<Menu> Menus { get; set; }
 
         public Role()
         {
-            // Menu = 
+
         }
 
         public Role(int? tenantId, string displayName)
