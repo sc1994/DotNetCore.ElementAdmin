@@ -1,10 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using Abp.Authorization.Roles;
 using DotNetCore.ElementAdmin.Authorization.Menus;
 using DotNetCore.ElementAdmin.Authorization.Users;
-using Microsoft.EntityFrameworkCore;
 
 namespace DotNetCore.ElementAdmin.Authorization.Roles
 {
@@ -12,11 +10,11 @@ namespace DotNetCore.ElementAdmin.Authorization.Roles
     {
         public const int MaxDescriptionLength = 5000;
 
-        public List<Menu> Menus { get; set; }
+        public ICollection<Menu> Menus { get; set; }
 
         public Role()
         {
-
+            Menus = new HashSet<Menu>();
         }
 
         public Role(int? tenantId, string displayName)

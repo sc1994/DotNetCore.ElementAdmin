@@ -14,7 +14,5 @@ namespace DotNetCore.ElementAdmin.Application.Menus.Dto
         public string Key { get; set; }
 
         public int RoleId { get; set; }
-
-        public RoleDto Role { get; set; }
     }
 }

@@ -21,7 +21,5 @@ namespace DotNetCore.ElementAdmin.Roles.Dto
         public string Description { get; set; }
 
         public List<string> GrantedPermissions { get; set; }
-
-        public List<string> GrantedMenuNames { get; set; }
     }
 }

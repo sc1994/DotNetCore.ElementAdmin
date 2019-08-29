@@ -14,8 +14,18 @@
       </el-table-column>
       <el-table-column align="center" label="Operations">
         <template slot-scope="scope">
-          <el-button type="primary" size="small" @click="handleEdit(scope)">Edit</el-button>
-          <el-button type="danger" size="small" @click="handleDelete(scope)">Delete</el-button>
+          <el-button
+            type="primary"
+            size="small"
+            @click="handleEdit(scope)"
+            :disabled="scope.row.key == 1"
+          >Edit</el-button>
+          <el-button
+            type="danger"
+            size="small"
+            @click="handleDelete(scope)"
+            :disabled="scope.row.key == 1"
+          >Delete</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -34,7 +44,7 @@
             placeholder="Role Description"
           />
         </el-form-item>
-        <el-form-item label="Permissions">
+        <el-form-item label="Permissions" v-if="role.permissions && role.permissions.length > 0">
           <el-checkbox
             :indeterminate="isPermissionsIndeterminate"
             v-model="isPermissionsAll"
@@ -51,7 +61,6 @@
         <el-form-item label="Menus">
           <el-tree
             ref="tree"
-            :check-strictly="checkStrictly"
             :data="routesData"
             :props="defaultProps"
             show-checkbox
@@ -96,7 +105,6 @@ export default {
       rolesList: [],
       dialogVisible: false,
       dialogType: "new",
-      checkStrictly: false,
       totalCount: 0,
       defaultProps: {
         children: "children",
@@ -112,10 +120,10 @@ export default {
         return {
           meta: x.meta,
           children: x.children,
-          key: `${x.path}_${x.name}`
+          key: x.name
         };
       };
-      return this.routes
+      let routes = this.routes
         .map(x => {
           if (x.hidden) return null;
           if (!x.meta && x.children && x.children.length > 0)
@@ -123,24 +131,35 @@ export default {
           return map(x);
         })
         .filter(x => x);
+      return this.routeDataMap(routes);
     }
   },
   created() {
-    // Mock: get all routes and roles list from server
-    // this.getRoutes() TODO: 暂时注释掉
-
     this.getRoles();
   },
   methods: {
-    mapToRole(source) {
+    // 映射到视图
+    mapToViewRole(source) {
       return {
         id: source.id,
-        key: source.name,
+        key: source.id,
         name: source.name,
         description: source.description || "NULL PLACEHOLDERS !",
-        routes: [], // TODO: 路由
+        routes: (source.menus || []).map(x => x.key),
         grantedPermissionNames: source.grantedPermissionNames || [],
         permissions: source.permissions || []
+      };
+    },
+    // 映射到数据
+    mapToDataRole(source) {
+      return {
+        name: source.name,
+        displayName: source.name,
+        normalizedName: source.name,
+        description: source.description,
+        grantedPermissions: source.grantedPermissionNames,
+        id: source.id,
+        grantedMenus: this.$refs.tree.getCheckedKeys()
       };
     },
     async getRoutes() {
@@ -152,53 +171,8 @@ export default {
       const { result } = await getRoles();
       this.totalCount = result.totalCount;
       this.rolesList = result.items.map(x => {
-        return this.mapToRole(x);
+        return this.mapToViewRole(x);
       });
-    },
-    // Reshape the routes structure so that it looks the same as the sidebar
-    generateRoutes(routes, basePath = "/") {
-      const res = [];
-
-      for (let route of routes) {
-        // skip some route
-        if (route.hidden) {
-          continue;
-        }
-
-        const onlyOneShowingChild = this.onlyOneShowingChild(
-          route.children,
-          route
-        );
-
-        if (route.children && onlyOneShowingChild && !route.alwaysShow) {
-          route = onlyOneShowingChild;
-        }
-
-        const data = {
-          path: path.resolve(basePath, route.path),
-          title: route.meta && route.meta.title
-        };
-
-        // recursive child routes
-        if (route.children) {
-          data.children = this.generateRoutes(route.children, data.path);
-        }
-        res.push(data);
-      }
-      return res;
-    },
-    generateArr(routes) {
-      let data = [];
-      routes.forEach(route => {
-        data.push(route);
-        if (route.children) {
-          const temp = this.generateArr(route.children);
-          if (temp.length > 0) {
-            data = [...data, ...temp];
-          }
-        }
-      });
-      return data;
     },
     handleAddRole() {
       this.role = Object.assign({}, defaultRole);
@@ -209,20 +183,21 @@ export default {
       this.dialogVisible = true;
     },
     async handleEdit(scope) {
+      let { result } = await getRoleForEdit(scope.row.id);
+      this.role = this.mapToViewRole({
+        ...result.role,
+        permissions: result.permissions
+      });
+
       this.dialogType = "edit";
       this.dialogVisible = true;
-      this.checkStrictly = true;
-      let { result } = await getRoleForEdit(scope.row.id);
-      this.role = this.mapToRole({
-        ...result.role,
-        permissions: result.permissions,
-        grantedPermissionNames: result.grantedPermissionNames
-      });
+
       this.$nextTick(() => {
-        // const routes = this.generateRoutes(this.role.routes); TODO:
-        // this.$refs.tree.setCheckedNodes(this.generateArr(routes));TODO:
-        // set checked state of a node not affects its father and child nodes
-        this.checkStrictly = false;
+        var keys = this.getRoutesByKeys(
+          this.role.routes,
+          deepClone(this.routesData)
+        ); // 获取选中数节点
+        this.$refs.tree.setCheckedNodes(keys); // 设置树结构的选中状态
       });
     },
     handleDelete({ $index, row }) {
@@ -243,42 +218,11 @@ export default {
           console.error(err);
         });
     },
-    generateTree(routes, basePath = "/", checkedKeys) {
-      const res = [];
-
-      for (const route of routes) {
-        const routePath = path.resolve(basePath, route.path);
-
-        // recursive child routes
-        if (route.children) {
-          route.children = this.generateTree(
-            route.children,
-            routePath,
-            checkedKeys
-          );
-        }
-
-        if (
-          checkedKeys.includes(routePath) ||
-          (route.children && route.children.length >= 1)
-        ) {
-          res.push(route);
-        }
-      }
-      return res;
-    },
     async confirmRole() {
       const isEdit = this.dialogType === "edit";
 
-      const checkedKeys = this.$refs.tree.getCheckedKeys();
-      this.role.routes = this.generateTree(
-        deepClone(this.serviceRoutes),
-        "/",
-        checkedKeys
-      );
-
       if (isEdit) {
-        await updateRole(this.role.key, this.role);
+        await updateRole(this.mapToDataRole(this.role));
         for (let index = 0; index < this.rolesList.length; index++) {
           if (this.rolesList[index].key === this.role.key) {
             this.rolesList.splice(index, 1, Object.assign({}, this.role));
@@ -303,27 +247,37 @@ export default {
           `,
         type: "success"
       });
-      handleCheckAllChange();
     },
-    // reference: src/view/layout/components/Sidebar/SidebarItem.vue
-    onlyOneShowingChild(children = [], parent) {
-      let onlyOneChild = null;
-      const showingChildren = children.filter(item => !item.hidden);
-
-      // When there is only one child route, the child route is displayed by default
-      if (showingChildren.length === 1) {
-        onlyOneChild = showingChildren[0];
-        onlyOneChild.path = path.resolve(parent.path, onlyOneChild.path);
-        return onlyOneChild;
+    // 映射路由数据(简化数据结构)
+    routeDataMap(routes) {
+      let result = [];
+      for (let route of routes) {
+        console.log(route);
+        let t = {
+          meta: route.meta,
+          key: route.key || route.name || route.meta.title
+        };
+        if (route.children) {
+          t.children = this.routeDataMap(route.children);
+        }
+        result.push(t);
       }
-
-      // Show parent if there are no child route to display
-      if (showingChildren.length === 0) {
-        onlyOneChild = { ...parent, path: "", noShowingChildren: true };
-        return onlyOneChild;
+      return result;
+    },
+    // 根据key获取路由数据
+    getRoutesByKeys(keys, routes) {
+      if (!keys) return [];
+      let result = [];
+      for (let route of routes) {
+        if (keys.indexOf(route.key) > -1) {
+          result.push(route);
+        }
+        if (route.children) {
+          var t = this.getRoutesByKeys(keys, route.children);
+          result.push(...t);
+        }
       }
-
-      return false;
+      return result;
     },
     // 树控件选择外显标题
     treeSelectLabel(data, node) {

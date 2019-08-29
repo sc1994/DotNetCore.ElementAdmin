@@ -1,11 +1,13 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using Abp.Application.Services.Dto;
 using Abp.Authorization.Roles;
+using DotNetCore.ElementAdmin.Application.Menus.Dto;
 using DotNetCore.ElementAdmin.Authorization.Roles;
 
 namespace DotNetCore.ElementAdmin.Roles.Dto
 {
-    public class RoleEditDto: EntityDto<int>
+    public class RoleEditDto : EntityDto<int>
     {
         [Required]
         [StringLength(AbpRoleBase.MaxNameLength)]
@@ -20,6 +22,8 @@ namespace DotNetCore.ElementAdmin.Roles.Dto
 
         public bool IsStatic { get; set; }
 
-        
+        public List<MenuDto> Menus { get; set; }
+
+        public List<string> GrantedPermissionNames { get; set; }
     }
 }

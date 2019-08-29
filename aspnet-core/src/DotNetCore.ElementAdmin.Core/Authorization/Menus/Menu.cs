@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Abp.Domain.Entities.Auditing;
+using DotNetCore.ElementAdmin.Authorization.Roles;
 
 namespace DotNetCore.ElementAdmin.Authorization.Menus
 {
@@ -13,5 +14,7 @@ namespace DotNetCore.ElementAdmin.Authorization.Menus
         public string Key { get; set; }
 
         public int RoleId { get; set; }
+
+        public Role Role { get; set; }
     }
 }

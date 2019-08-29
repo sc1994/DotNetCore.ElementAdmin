@@ -9,11 +9,13 @@ using Abp.Organizations;
 using Abp.Runtime.Caching;
 using Abp.Zero.Configuration;
 using DotNetCore.ElementAdmin.Authorization.Users;
+using System.Threading.Tasks;
 
 namespace DotNetCore.ElementAdmin.Authorization.Roles
 {
     public class RoleManager : AbpRoleManager<Role, User>
     {
+        private readonly RoleStore _store;
         public RoleManager(
             RoleStore store,
             IEnumerable<IRoleValidator<Role>> roleValidators,
@@ -38,6 +40,11 @@ namespace DotNetCore.ElementAdmin.Authorization.Roles
                   organizationUnitRepository,
                   organizationUnitRoleRepository)
         {
+            _store = store;
+        }
+        public async Task<Role> GetRoleForEdit(int key)
+        {
+            return await _store.GetRoleForEdit(key);
         }
     }
 }

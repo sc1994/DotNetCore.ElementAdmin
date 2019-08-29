@@ -3,14 +3,16 @@ using System;
 using DotNetCore.ElementAdmin.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DotNetCore.ElementAdmin.Migrations
 {
     [DbContext(typeof(ElementAdminDbContext))]
-    partial class ElementAdminDbContextModelSnapshot : ModelSnapshot
+    [Migration("20190829021424_Init_20190829101418_remove_efdemoid")]
+    partial class Init_20190829101418_remove_efdemoid
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

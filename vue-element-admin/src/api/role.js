@@ -22,9 +22,9 @@ export function addRole(data) {
   })
 }
 
-export function updateRole(id, data) {
+export function updateRole(data) {
   return request({
-    url: `/role/${id}`,
+    url: "/services/app/Role/Update",
     method: 'put',
     data
   })
