@@ -1,7 +1,8 @@
 import axios from 'axios'
 import {
   // MessageBox,
-  Message
+  Message,
+  Notification
 } from 'element-ui'
 import store from '@/store'
 import {
@@ -78,11 +79,28 @@ service.interceptors.response.use(
   },
   error => {
     console.log('err' + error) // for debug
-    Message({
-      message: error.message,
-      type: 'error',
-      duration: 5 * 1000
-    })
+
+    if (error.response.status == 400) {
+      let arr = error.response.data.error.details.split("\r\n");
+      let html = "";
+      for (let item of arr) {
+        if (!item || item == undefined + "") continue;
+        html += `<div>${item}</div>`;
+      }
+      Notification({
+        title: error.response.data.error.message,
+        dangerouslyUseHTMLString: true,
+        message: html,
+        type: "error"
+      });
+    } else {
+      Message({
+        message: error.message,
+        type: 'error',
+        duration: 5 * 1000
+      })
+    }
+
     return Promise.reject(error)
   }
 )

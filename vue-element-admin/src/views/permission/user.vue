@@ -27,7 +27,7 @@
       </el-table-column>
       <el-table-column align="center" label="Roles">
         <template slot-scope="scope">
-          <el-tag v-for="name in scope.row.roleNames">{{ name }}</el-tag>
+          <el-tag v-for="name in scope.row.roleNames" style="margin-right:5px;">{{ name }}</el-tag>
         </template>
       </el-table-column>
       <el-table-column align="center" label="Creation Time" width="220">
@@ -63,34 +63,51 @@
       :current-page.sync="currentPage"
     ></el-pagination>
 
-    <el-dialog :visible.sync="dialogVisible" :title="dialogType==='edit'?'Edit Role':'New Role'">
+    <el-dialog :visible.sync="dialogVisible" :title="dialogType==='edit'?'Edit User':'New User'">
       <el-form :model="user" label-width="120px" label-position="rigth">
         <el-form-item label="User Name">
-          <el-input v-model="user.name" placeholder="User Name" />
+          <el-input
+            v-model="user.userName"
+            placeholder="User Name"
+            :disabled="dialogType==='edit'"
+          />
         </el-form-item>
         <el-form-item label="Email Address">
-          <el-input v-model="user.name" placeholder="Email Address" />
+          <el-input
+            v-model="user.emailAddress"
+            placeholder="Email Address"
+            :disabled="dialogType==='edit'"
+          />
+        </el-form-item>
+        <el-form-item label="Initial Password" v-if="dialogType==='new'">
+          <el-input :value="user.password" disabled />
         </el-form-item>
         <el-form-item label="Roles">
-          <el-transfer v-model="user.roles" :data="allRoles" :titles="['Roles', 'Selected']"></el-transfer>
+          <el-transfer v-model="user.roleNames" :data="allRoles" :titles="['Roles', 'Selected']"></el-transfer>
         </el-form-item>
-        <el-form-item label="Email Address" v-if="dialogType == 'Edit User'">
-          <el-input v-model="user.name" placeholder="Email Address" />
+        <el-form-item label="Status" v-if="dialogType == 'edit'">
+          <!-- <el-input v-model="user.name" placeholder="Email Address" /> -->
+          TODO:
         </el-form-item>
       </el-form>
       <div style="text-align:right;">
         <el-button type="danger" @click="dialogVisible=false">Cancel</el-button>
-        <el-button type="primary" @click>Confirm</el-button>
+        <el-button type="primary" @click="confirmUser">Confirm</el-button>
       </div>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import { getUsers } from "@/api/user";
-import { deepClone } from "@/utils";
+import { getUsers, addUser } from "@/api/user";
+import { deepClone, randomCipher } from "@/utils";
 import { getRoles } from "@/api/role";
-const defaultUser = {};
+const defaultUser = {
+  userName: "",
+  emailAddress: "",
+  password: "",
+  roleNames: []
+};
 
 export default {
   data() {
@@ -100,15 +117,35 @@ export default {
       currentPage: 1,
       usersDataTable: [],
       dialogVisible: false,
-      user: {},
+      user: deepClone(defaultUser),
       dialogType: "",
       allRoles: []
     };
   },
   methods: {
+    async confirmUser() {
+      this.user.name = this.user.userName;
+      this.user.surname = this.user.userName;
+      if (this.dialogType == "new") {
+        this.isActive = true;
+        await addUser(this.user);
+      }
+      this.dialogVisible = false;
+      this.$notify({
+        title: "Success",
+        dangerouslyUseHTMLString: true,
+        message: `
+            <div>User Name: ${this.user.userName}</div>
+            <div>Email Address: ${this.user.emailAddress}</div>
+          `,
+        type: "success"
+      });
+      await this.getUsers(this.currentPage);
+    },
     handleAddUser() {
       this.user = deepClone(defaultUser);
-      this.dialogType = "Add User";
+      this.user.password = randomCipher();
+      this.dialogType = "new";
       this.dialogVisible = true;
     },
     async getUsers(page = 1) {
@@ -122,7 +159,7 @@ export default {
       this.allRoles = result.items.map(x => {
         return {
           label: x.normalizedName,
-          key: x.id
+          key: x.normalizedName
         };
       });
     }

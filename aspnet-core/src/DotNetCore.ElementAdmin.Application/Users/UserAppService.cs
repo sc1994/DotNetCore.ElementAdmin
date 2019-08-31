@@ -156,7 +156,8 @@ namespace DotNetCore.ElementAdmin.Users
 
         protected override IQueryable<User> ApplySorting(IQueryable<User> query, PagedUserResultRequestDto input)
         {
-            return query.OrderBy(r => r.UserName);
+            return query.OrderByDescending(r => r.Id == 1)
+                        .ThenByDescending(r => r.Id);
         }
 
         protected virtual void CheckErrors(IdentityResult identityResult)

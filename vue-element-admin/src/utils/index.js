@@ -355,3 +355,16 @@ export function pageToSkipCount(pageIndex, pageSize) {
   if (!pageIndex) return 0;
   return parseInt(((pageIndex - 1) * pageSize).toFixed(0), 10);
 }
+
+
+export function randomCipher() {
+  const seed = "!@#$%^&*()_+QWERT?YUIOPASDFGHJKLMNBVCXZ1234567890";
+  var result = "";
+  for (var i = 0; i < 10; i++) {
+    let t = seed[(Math.random() * seed.length).toFixed(0)];
+    if (t) {
+      result += t;
+    }
+  }
+  return result;
+}

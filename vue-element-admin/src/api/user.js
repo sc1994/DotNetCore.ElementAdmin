@@ -32,3 +32,11 @@ export function getUsers(key, page) {
     method: 'get'
   })
 }
+
+export function addUser(data) {
+  return request({
+    url: "/services/app/User/Create",
+    method: 'post',
+    data
+  })
+}
