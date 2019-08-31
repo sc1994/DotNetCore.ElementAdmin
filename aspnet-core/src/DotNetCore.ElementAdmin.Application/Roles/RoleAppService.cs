@@ -1,5 +1,4 @@
-﻿using System.Net;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Abp.Application.Services;
@@ -25,23 +24,21 @@ namespace DotNetCore.ElementAdmin.Roles
     {
         private readonly RoleManager _roleManager;
         private readonly UserManager _userManager;
-        private readonly IRepository<Menu, long> _menuRepository;
         private readonly MenuManager _menuManager;
         private readonly ILogger<RoleAppService> _log;
+        private readonly IRepository<Role> _repository;
 
         public RoleAppService(
             IRepository<Role> repository,
             RoleManager roleManager,
             UserManager userManager,
-            IRepository<Menu, long> menuRepository,
             MenuManager menuManager,
             ILogger<RoleAppService> log
-        )
-            : base(repository)
+        ) : base(repository)
         {
+            _repository = repository;
             _roleManager = roleManager;
             _userManager = userManager;
-            _menuRepository = menuRepository;
             _menuManager = menuManager;
             _log = log;
         }
@@ -57,10 +54,11 @@ namespace DotNetCore.ElementAdmin.Roles
 
             var grantedPermissions = PermissionManager
                 .GetAllPermissions()
-                .Where(p => input.GrantedPermissions.Contains(p.Name))
+                .Where(p => input.GrantedPermissions?.Contains(p.Name) ?? false)
                 .ToList();
 
             await _roleManager.SetGrantedPermissionsAsync(role, grantedPermissions);
+            await _menuManager.CoverAllAsync(role.Id, input.GrantedMenus);
 
             return MapToEntityDto(role);
         }
@@ -143,7 +141,8 @@ namespace DotNetCore.ElementAdmin.Roles
 
         protected override IQueryable<Role> ApplySorting(IQueryable<Role> query, PagedRoleResultRequestDto input)
         {
-            return query.OrderBy(r => r.DisplayName);
+            return query.OrderByDescending(x => x.Name == "Admin")
+                        .ThenByDescending(r => r.Id);
         }
 
         protected virtual void CheckErrors(IdentityResult identityResult)

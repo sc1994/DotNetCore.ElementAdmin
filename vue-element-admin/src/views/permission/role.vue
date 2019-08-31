@@ -3,7 +3,7 @@
     <el-button type="primary" @click="handleAddRole">New Role</el-button>
 
     <el-table :data="rolesList" style="width: 100%;margin-top:30px;" border>
-      <el-table-column align="center" label="Role Key" width="220">
+      <el-table-column align="center" label="Role Id" width="220">
         <template slot-scope="scope">{{ scope.row.key }}</template>
       </el-table-column>
       <el-table-column align="center" label="Role Name" width="220">
@@ -29,10 +29,15 @@
         </template>
       </el-table-column>
     </el-table>
-    <el-pagination background layout="total, prev, pager, next" :total="totalCount"></el-pagination>
+    <el-pagination
+      background
+      layout="total, prev, pager, next"
+      :total="totalCount"
+      :current-page.sync="currentPage"
+    ></el-pagination>
 
     <el-dialog :visible.sync="dialogVisible" :title="dialogType==='edit'?'Edit Role':'New Role'">
-      <el-form :model="role" label-width="100px" label-position="left">
+      <el-form :model="role" label-width="100px" label-position="rigth">
         <el-form-item label="Name">
           <el-input v-model="role.name" placeholder="Role Name" />
         </el-form-item>
@@ -62,7 +67,7 @@
           <el-tree
             ref="tree"
             :data="routesData"
-            :props="defaultProps"
+            :props="{ children: 'children', label: this.treeSelectLabel }"
             show-checkbox
             node-key="key"
             class="permission-tree"
@@ -82,7 +87,6 @@ import path from "path";
 import { deepClone } from "@/utils";
 import { asyncRoutes, constantRoutes } from "@/router";
 import {
-  getRoutes,
   getRoles,
   addRole,
   deleteRole,
@@ -94,7 +98,8 @@ const defaultRole = {
   key: "",
   name: "",
   description: "",
-  routes: []
+  routes: [],
+  grantedPermissionNames: []
 };
 
 export default {
@@ -106,12 +111,9 @@ export default {
       dialogVisible: false,
       dialogType: "new",
       totalCount: 0,
-      defaultProps: {
-        children: "children",
-        label: this.treeSelectLabel
-      },
       isPermissionsIndeterminate: false,
-      isPermissionsAll: false
+      isPermissionsAll: false,
+      currentPage: 1
     };
   },
   computed: {
@@ -143,7 +145,7 @@ export default {
       return {
         id: source.id,
         key: source.id,
-        name: source.name,
+        name: source.normalizedName || source.name.toUpperCase(),
         description: source.description || "NULL PLACEHOLDERS !",
         routes: (source.menus || []).map(x => x.key),
         grantedPermissionNames: source.grantedPermissionNames || [],
@@ -162,13 +164,8 @@ export default {
         grantedMenus: this.$refs.tree.getCheckedKeys()
       };
     },
-    async getRoutes() {
-      const res = await getRoutes();
-      this.serviceRoutes = res.data;
-      this.routes = this.generateRoutes(res.data);
-    },
-    async getRoles() {
-      const { result } = await getRoles();
+    async getRoles(page = 1) {
+      const { result } = await getRoles(page);
       this.totalCount = result.totalCount;
       this.rolesList = result.items.map(x => {
         return this.mapToViewRole(x);
@@ -208,7 +205,7 @@ export default {
       })
         .then(async () => {
           await deleteRole(row.key);
-          this.rolesList.splice($index, 1);
+          await this.getRoles(this.currentPage);
           this.$message({
             type: "success",
             message: "Delete succed!"
@@ -223,18 +220,9 @@ export default {
 
       if (isEdit) {
         await updateRole(this.mapToDataRole(this.role));
-        for (let index = 0; index < this.rolesList.length; index++) {
-          if (this.rolesList[index].key === this.role.key) {
-            this.rolesList.splice(index, 1, Object.assign({}, this.role));
-            break;
-          }
-        }
       } else {
-        const { data } = await addRole(this.role);
-        this.role.key = data.key;
-        this.rolesList.push(this.role);
+        await addRole(this.mapToDataRole(this.role));
       }
-
       const { description, key, name } = this.role;
       this.dialogVisible = false;
       this.$notify({
@@ -247,12 +235,12 @@ export default {
           `,
         type: "success"
       });
+      await this.getRoles(this.currentPage);
     },
     // 映射路由数据(简化数据结构)
     routeDataMap(routes) {
       let result = [];
       for (let route of routes) {
-        console.log(route);
         let t = {
           meta: route.meta,
           key: route.key || route.name || route.meta.title
@@ -293,9 +281,15 @@ export default {
   watch: {
     "role.grantedPermissionNames"(value) {
       let checkedCount = value.length;
-      this.isPermissionsAll = checkedCount === this.role.permissions.length;
+      this.isPermissionsAll =
+        this.role.permissions && checkedCount === this.role.permissions.length;
       this.isPermissionsIndeterminate =
-        checkedCount > 0 && checkedCount < this.role.permissions.length;
+        this.role.permissions &&
+        checkedCount > 0 &&
+        checkedCount < this.role.permissions.length;
+    },
+    currentPage(val) {
+      this.getRoles(val);
     }
   }
 };

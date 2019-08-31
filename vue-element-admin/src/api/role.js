@@ -1,22 +1,18 @@
 import request from '@/utils/request'
+import {
+  pageToSkipCount
+} from "@/utils";
 
-export function getRoutes() {
+export function getRoles(page, size = 10) {
   return request({
-    url: '/routes',
-    method: 'get'
-  })
-}
-
-export function getRoles() {
-  return request({
-    url: '/services/app/Role/GetAll',
+    url: `/services/app/Role/GetAll?SkipCount=${pageToSkipCount(page, size)}&MaxResultCount=${size}`,
     method: 'get'
   })
 }
 
 export function addRole(data) {
   return request({
-    url: '/role',
+    url: '/services/app/Role/Create',
     method: 'post',
     data
   })
@@ -32,7 +28,7 @@ export function updateRole(data) {
 
 export function deleteRole(id) {
   return request({
-    url: `/role/${id}`,
+    url: `/services/app/Role/Delete?Id=${id}`,
     method: 'delete'
   })
 }
