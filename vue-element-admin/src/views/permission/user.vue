@@ -99,7 +99,13 @@
 </template>
 
 <script>
-import { getUsers, addUser, updateUser, resetPassword } from "@/api/user";
+import {
+  getUsers,
+  addUser,
+  updateUser,
+  resetPassword,
+  deleteUser
+} from "@/api/user";
 import { deepClone, randomCipher } from "@/utils";
 import { getRoles } from "@/api/role";
 import { async } from "q";
@@ -166,7 +172,7 @@ export default {
       }
       this.dialogVisible = false;
       this.$notify({
-        title: "Success",
+        title: "Confirm Success",
         dangerouslyUseHTMLString: true,
         message: `
             <div>User Name: ${this.user.userName}</div>
@@ -186,6 +192,19 @@ export default {
       this.user = deepClone(scope.row);
       this.dialogType = "edit";
       this.dialogVisible = true;
+    },
+    async handleDelete(scope) {
+      await deleteUser(scope.row.id);
+      this.$notify({
+        title: "Delete Success",
+        dangerouslyUseHTMLString: true,
+        message: `
+            <div>User Name: ${scope.row.userName}</div>
+            <div>Email Address: ${scope.row.emailAddress}</div>
+          `,
+        type: "success"
+      });
+      await this.getUsers(this.currentPage);
     },
     async getUsers(page = 1) {
       let { result } = await getUsers(this.formSearch.key || "", page);

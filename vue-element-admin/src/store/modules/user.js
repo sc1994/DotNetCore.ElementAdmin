@@ -1,6 +1,6 @@
 import {
   login,
-  logout,
+  // logout,
   getInfo
 } from '@/api/user'
 import {

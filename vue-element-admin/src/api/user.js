@@ -56,3 +56,11 @@ export function resetPassword(data) {
     data
   })
 }
+
+
+export function deleteUser(id) {
+  return request({
+    url: `/services/app/User/Delete?id=` + id,
+    method: "delete"
+  })
+}

@@ -67,8 +67,17 @@ service.interceptors.response.use(
   error => {
     console.log('err' + error) // for debug
 
-    if (error.response.status == 400 || error.response.status == 500) {
-
+    if (error.response.status == 401) { // 重新登录逻辑
+      MessageBox.confirm('You have been logged out, you can cancel to stay on this page, or log in again', 'Confirm logout', {
+        confirmButtonText: 'Re-Login',
+        cancelButtonText: 'Cancel',
+        type: 'warning'
+      }).then(() => {
+        store.dispatch('user/resetToken').then(() => {
+          location.reload()
+        })
+      })
+    } else {
       let html = "";
       if (error.response.data.error.details) {
         let arr = error.response.data.error.details.split("\r\n");
@@ -83,22 +92,6 @@ service.interceptors.response.use(
         message: html,
         type: "error"
       });
-    } else if (error.response.status == 401) { // 重新登录逻辑
-      MessageBox.confirm('You have been logged out, you can cancel to stay on this page, or log in again', 'Confirm logout', {
-        confirmButtonText: 'Re-Login',
-        cancelButtonText: 'Cancel',
-        type: 'warning'
-      }).then(() => {
-        store.dispatch('user/resetToken').then(() => {
-          location.reload()
-        })
-      })
-    } else {
-      Message({
-        message: error.message,
-        type: 'error',
-        duration: 5 * 1000
-      })
     }
 
     return Promise.reject(error)
