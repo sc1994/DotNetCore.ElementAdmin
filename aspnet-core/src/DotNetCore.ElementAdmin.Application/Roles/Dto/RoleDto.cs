@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Abp.Application.Services.Dto;
 using Abp.Authorization.Roles;
-using Abp.AutoMapper;
 using DotNetCore.ElementAdmin.Authorization.Roles;
 
 namespace DotNetCore.ElementAdmin.Roles.Dto

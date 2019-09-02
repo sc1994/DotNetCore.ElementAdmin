@@ -1,7 +1,9 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Abp.Domain.Repositories;
 using Abp.Domain.Services;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
@@ -24,7 +26,7 @@ namespace DotNetCore.ElementAdmin.Authorization.Menus
         /// 覆盖全部
         /// </summary>
         /// <returns></returns>
-        public async Task CoverAllAsync(int roleId, List<string> newMenus)
+        public async Task CoverAllByRoleAsync(int roleId, List<string> newMenus)
         {
             await _menuRepository.DeleteAsync(x => x.RoleId == roleId);
             foreach (var menu in newMenus)
@@ -38,5 +40,19 @@ namespace DotNetCore.ElementAdmin.Authorization.Menus
             }
         }
 
+        /// <summary>
+        /// 根据角色id获取菜单key
+        /// </summary>
+        /// <param name="roleId"></param>
+        /// <returns></returns>
+        public async Task<List<string>> GetMenuKeysByRoleIdAsync(int roleId)
+        {
+            var result = await _menuRepository.GetAll()
+                                              .Include(x => x.Key)
+                                              .Where(x => x.RoleId == roleId)
+                                              .Select(x => x.Key)
+                                              .ToListAsync();
+            return result;
+        }
     }
 }

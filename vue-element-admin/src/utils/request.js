@@ -1,13 +1,13 @@
-import axios from 'axios'
+import axios from "axios"
 import {
   // MessageBox,
   Message,
   Notification
-} from 'element-ui'
-import store from '@/store'
+} from "element-ui"
+import store from "@/store"
 import {
   getToken
-} from '@/utils/auth'
+} from "@/utils/auth"
 
 // create an axios instance
 const service = axios.create({
@@ -23,9 +23,9 @@ service.interceptors.request.use(
 
     if (store.getters.token) {
       // let each request carry token
-      // ['X-Token'] is a custom headers key
+      // ["X-Token"] is a custom headers key
       // please modify it according to the actual situation
-      config.headers['Authorization'] = 'Bearer ' + getToken()
+      config.headers["Authorization"] = "Bearer " + getToken()
     }
     return config
   },
@@ -54,32 +54,37 @@ service.interceptors.response.use(
     // if the custom code is not 20000, it is judged as an error.
     if (!res.success) {
       Message({
-        message: res.error.message || 'Error',
-        type: 'error',
+        message: res.error.message || "Error",
+        type: "error",
         duration: 5 * 1000
       })
 
-      return Promise.reject(new Error(res.error.message || 'Error'))
+      return Promise.reject(new Error(res.error.message || "Error"))
     } else {
       return res
     }
   },
   error => {
-    console.log('err' + error) // for debug
+    console.log("err" + error) // for debug
 
     if (error.response.status == 401) { // 重新登录逻辑
-      MessageBox.confirm('You have been logged out, you can cancel to stay on this page, or log in again', 'Confirm logout', {
-        confirmButtonText: 'Re-Login',
-        cancelButtonText: 'Cancel',
-        type: 'warning'
+      MessageBox.confirm("You have been logged out, you can cancel to stay on this page, or log in again", "Confirm logout", {
+        confirmButtonText: "Re-Login",
+        cancelButtonText: "Cancel",
+        type: "warning"
       }).then(() => {
-        store.dispatch('user/resetToken').then(() => {
+        store.dispatch("user/resetToken").then(() => {
           location.reload()
         })
       })
     } else {
+      if (!error.response.data) {
+        console.log(error.response);
+        Message.error(`response status is ${error.response.status} !`);
+        return;
+      }
       let html = "";
-      if (error.response.data.error.details) {
+      if (!!error.response.data.error.details) {
         let arr = error.response.data.error.details.split("\r\n");
         for (let item of arr) {
           if (!item || item == undefined + "") continue;

@@ -35,6 +35,9 @@ const mutations = {
   },
   SET_ROLES: (state, roles) => {
     state.roles = roles
+  },
+  SET_MENUS: (state, menus) => {
+    state.menus = menus
   }
 }
 
@@ -79,7 +82,9 @@ const actions = {
           reject('Verification failed, please Login again.')
         }
 
-        const roles = ['admin'] // TODO:
+        // const roles = result.user.grantedRoles;
+        const roles = ["admin"];
+        const menus = result.user.grantedMenus;
         const name = result.user.name
         const avatar = 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif' // TODO:
         const introduction = '' // TODO:
@@ -90,6 +95,7 @@ const actions = {
         }
 
         commit('SET_ROLES', roles)
+        commit('SET_MENUS', menus)
         commit('SET_NAME', name)
         commit('SET_AVATAR', avatar)
         commit('SET_INTRODUCTION', introduction)
@@ -114,6 +120,7 @@ const actions = {
       // logout(state.token).then(() => { TODO: 没有请求后端接口
       commit('SET_TOKEN', '')
       commit('SET_ROLES', [])
+      commit('SET_MENUS', [])
       removeToken()
       resetRouter()
       resolve()
@@ -130,6 +137,7 @@ const actions = {
     return new Promise(resolve => {
       commit('SET_TOKEN', '')
       commit('SET_ROLES', [])
+      commit('SET_MENUS', [])
       removeToken()
       resolve()
     })

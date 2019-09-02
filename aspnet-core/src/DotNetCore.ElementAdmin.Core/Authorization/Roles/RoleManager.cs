@@ -42,6 +42,7 @@ namespace DotNetCore.ElementAdmin.Authorization.Roles
         {
             _store = store;
         }
+        
         public async Task<Role> GetRoleForEdit(int key)
         {
             return await _store.GetRoleForEdit(key);

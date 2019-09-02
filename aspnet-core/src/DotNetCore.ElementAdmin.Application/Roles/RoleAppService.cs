@@ -43,6 +43,14 @@ namespace DotNetCore.ElementAdmin.Roles
             _log = log;
         }
 
+        public override async Task<RoleDto> Get(EntityDto<int> input)
+        {
+            var result = await base.Get(new EntityDto<int>(input.Id));
+            var menuKeys = await _menuManager.GetMenuKeysByRoleIdAsync(input.Id);
+            result.GrantedMenus = menuKeys;
+            return result;
+        }
+
         public override async Task<RoleDto> Create(CreateRoleDto input)
         {
             CheckCreatePermission();
@@ -58,7 +66,7 @@ namespace DotNetCore.ElementAdmin.Roles
                 .ToList();
 
             await _roleManager.SetGrantedPermissionsAsync(role, grantedPermissions);
-            await _menuManager.CoverAllAsync(role.Id, input.GrantedMenus);
+            await _menuManager.CoverAllByRoleAsync(role.Id, input.GrantedMenus);
 
             return MapToEntityDto(role);
         }
@@ -93,7 +101,7 @@ namespace DotNetCore.ElementAdmin.Roles
 
             await _roleManager.SetGrantedPermissionsAsync(role, grantedPermissions);
 
-            await _menuManager.CoverAllAsync(role.Id, input.GrantedMenus);
+            await _menuManager.CoverAllByRoleAsync(role.Id, input.GrantedMenus);
 
             return MapToEntityDto(role);
         }
