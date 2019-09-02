@@ -40,3 +40,19 @@ export function addUser(data) {
     data
   })
 }
+
+export function updateUser(data) {
+  return request({
+    url: "/services/app/User/Update",
+    method: 'put',
+    data
+  })
+}
+
+export function resetPassword(data) {
+  return request({
+    url: "/services/app/User/ResetPassword",
+    method: 'post',
+    data
+  })
+}

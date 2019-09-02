@@ -59,19 +59,6 @@ service.interceptors.response.use(
         duration: 5 * 1000
       })
 
-      // 50008: Illegal token; 50012: Other clients logged in; 50014: Token expired;
-      // if (res.code === 50008 || res.code === 50012 || res.code === 50014) {
-      //   // to re-login
-      //   MessageBox.confirm('You have been logged out, you can cancel to stay on this page, or log in again', 'Confirm logout', {
-      //     confirmButtonText: 'Re-Login',
-      //     cancelButtonText: 'Cancel',
-      //     type: 'warning'
-      //   }).then(() => {
-      //     store.dispatch('user/resetToken').then(() => {
-      //       location.reload()
-      //     })
-      //   })
-      // } // TODO: 重新登录逻辑
       return Promise.reject(new Error(res.error.message || 'Error'))
     } else {
       return res
@@ -80,12 +67,15 @@ service.interceptors.response.use(
   error => {
     console.log('err' + error) // for debug
 
-    if (error.response.status == 400) {
-      let arr = error.response.data.error.details.split("\r\n");
+    if (error.response.status == 400 || error.response.status == 500) {
+
       let html = "";
-      for (let item of arr) {
-        if (!item || item == undefined + "") continue;
-        html += `<div>${item}</div>`;
+      if (error.response.data.error.details) {
+        let arr = error.response.data.error.details.split("\r\n");
+        for (let item of arr) {
+          if (!item || item == undefined + "") continue;
+          html += `<div>${item}</div>`;
+        }
       }
       Notification({
         title: error.response.data.error.message,
@@ -93,6 +83,16 @@ service.interceptors.response.use(
         message: html,
         type: "error"
       });
+    } else if (error.response.status == 401) { // 重新登录逻辑
+      MessageBox.confirm('You have been logged out, you can cancel to stay on this page, or log in again', 'Confirm logout', {
+        confirmButtonText: 'Re-Login',
+        cancelButtonText: 'Cancel',
+        type: 'warning'
+      }).then(() => {
+        store.dispatch('user/resetToken').then(() => {
+          location.reload()
+        })
+      })
     } else {
       Message({
         message: error.message,

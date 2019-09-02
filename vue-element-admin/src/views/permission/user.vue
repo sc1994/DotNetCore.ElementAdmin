@@ -27,7 +27,7 @@
       </el-table-column>
       <el-table-column align="center" label="Roles">
         <template slot-scope="scope">
-          <el-tag v-for="name in scope.row.roleNames" style="margin-right:5px;">{{ name }}</el-tag>
+          <el-tag v-for="name in scope.row.roleNames" style="margin:2px;">{{ name }}</el-tag>
         </template>
       </el-table-column>
       <el-table-column align="center" label="Creation Time" width="220">
@@ -36,7 +36,7 @@
       <el-table-column align="center" label="Status" width="180">
         <template slot-scope="scope">
           <el-tag type="success" v-if="scope.row.isActive">Active</el-tag>
-          <el-tag type="success" v-else>Slumber</el-tag>
+          <el-tag type="info" v-else>Slumber</el-tag>
         </template>
       </el-table-column>
       <el-table-column align="center" label="Operations">
@@ -79,15 +79,15 @@
             :disabled="dialogType==='edit'"
           />
         </el-form-item>
-        <el-form-item label="Initial Password" v-if="dialogType==='new'">
-          <el-input :value="user.password" disabled />
+        <el-form-item label="Password">
+          <el-input :value="user.password" disabled v-if="dialogType==='new'" />
+          <el-button type="primary" plain v-else @click="resetPassword">Reset Password</el-button>
         </el-form-item>
         <el-form-item label="Roles">
           <el-transfer v-model="user.roleNames" :data="allRoles" :titles="['Roles', 'Selected']"></el-transfer>
         </el-form-item>
-        <el-form-item label="Status" v-if="dialogType == 'edit'">
-          <!-- <el-input v-model="user.name" placeholder="Email Address" /> -->
-          TODO:
+        <el-form-item label="Active" v-if="dialogType == 'edit'">
+          <el-switch v-model="user.isActive" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
         </el-form-item>
       </el-form>
       <div style="text-align:right;">
@@ -99,9 +99,10 @@
 </template>
 
 <script>
-import { getUsers, addUser } from "@/api/user";
+import { getUsers, addUser, updateUser, resetPassword } from "@/api/user";
 import { deepClone, randomCipher } from "@/utils";
 import { getRoles } from "@/api/role";
+import { async } from "q";
 const defaultUser = {
   userName: "",
   emailAddress: "",
@@ -119,16 +120,49 @@ export default {
       dialogVisible: false,
       user: deepClone(defaultUser),
       dialogType: "",
-      allRoles: []
+      allRoles: [],
+      adminPassword: ""
     };
   },
   methods: {
+    resetPassword() {
+      this.$msgbox({
+        title: "Reset Password",
+        showInput: true,
+        inputPlaceholder: "Verify Admin Password",
+        inputType: "password",
+        showCancelButton: true,
+        confirmButtonText: "Ok",
+        cancelButtonText: "Off",
+        beforeClose: async (action, instance, done) => {
+          done();
+        }
+      })
+        .then(async (input, instance) => {
+          let newPassword = randomCipher();
+          await resetPassword({
+            adminPassword: input.value,
+            userId: this.user.id,
+            newPassword: newPassword
+          });
+          this.$notify({
+            title: "Success",
+            message: "New Passwor is " + newPassword,
+            type: "success"
+          });
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    },
     async confirmUser() {
       this.user.name = this.user.userName;
       this.user.surname = this.user.userName;
       if (this.dialogType == "new") {
-        this.isActive = true;
+        this.user.isActive = true;
         await addUser(this.user);
+      } else {
+        await updateUser(this.user);
       }
       this.dialogVisible = false;
       this.$notify({
@@ -146,6 +180,11 @@ export default {
       this.user = deepClone(defaultUser);
       this.user.password = randomCipher();
       this.dialogType = "new";
+      this.dialogVisible = true;
+    },
+    handleEdit(scope) {
+      this.user = deepClone(scope.row);
+      this.dialogType = "edit";
       this.dialogVisible = true;
     },
     async getUsers(page = 1) {
