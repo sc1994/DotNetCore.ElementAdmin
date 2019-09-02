@@ -205,7 +205,7 @@ namespace DotNetCore.ElementAdmin.Users
                 return false;
             }
             var roles = await _userManager.GetRolesAsync(currentUser);
-            if (!roles.Contains(StaticRoleNames.Tenants.Admin))
+            if (!roles.Contains(StaticRoleNames.Tenants.Admin.ToUpper()))
             {
                 throw new UserFriendlyException("Only administrators may reset passwords.");
             }

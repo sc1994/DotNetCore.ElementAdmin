@@ -22,9 +22,16 @@ export function filterAsyncRoutes(routes) {
     } else {
       tmp.children = [];
     }
-    if (!tmp.meta && tmp.children && tmp.children.length > 0)
-      res.push(tmp.children[0])
-    else if (user.state.menus.indexOf(tmp.name) > -1)
+    if (!tmp.meta && tmp.children && tmp.children.length > 0) {
+      // let t = {
+      //   ...tmp.children[0],
+      //   ...tmp
+      // };
+      // t.children = [];
+      // res.push(t)
+      console.log(tmp);
+      res.push(tmp)
+    } else if (user.state.menus.indexOf(tmp.name) > -1)
       res.push(tmp)
   })
   return res
