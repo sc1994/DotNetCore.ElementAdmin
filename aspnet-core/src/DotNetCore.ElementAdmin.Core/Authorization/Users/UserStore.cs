@@ -51,7 +51,7 @@ namespace DotNetCore.ElementAdmin.Authorization.Users
                                             )
                                             .FirstOrDefaultAsync(x => x.Id == int.Parse(id));
 
-            var roleIds = user.Roles.Select(s => s.Id).ToList();
+            var roleIds = user.Roles.Select(s => s.RoleId).ToList();
             var roles = await _roleRepository.GetAll()
                                              .Include(x => x.Menus)
                                              .Select(s => new

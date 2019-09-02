@@ -1,9 +1,8 @@
 import Layout from '@/layout'
 
-let chartsRouter = [{
-  path: '/charts',
-  component: Layout,
-  redirect: 'noRedirect',
+const chartsRouter = [{
+  path: 'charts',
+  component: () => import("@/views/dev-example/index"),
   name: 'Charts',
   meta: {
     title: 'Charts',
@@ -11,7 +10,7 @@ let chartsRouter = [{
   },
   children: [{
       path: 'keyboard',
-      component: () => import('@/views/charts/keyboard'),
+      component: () => import('@/views/dev-example/charts/keyboard'),
       name: 'KeyboardChart',
       meta: {
         title: 'Keyboard Chart',
@@ -20,7 +19,7 @@ let chartsRouter = [{
     },
     {
       path: 'line',
-      component: () => import('@/views/charts/line'),
+      component: () => import('@/views/dev-example/charts/line'),
       name: 'LineChart',
       meta: {
         title: 'Line Chart',
@@ -29,7 +28,7 @@ let chartsRouter = [{
     },
     {
       path: 'mix-chart',
-      component: () => import('@/views/charts/mix-chart'),
+      component: () => import('@/views/dev-example/charts/mix-chart'),
       name: 'MixChart',
       meta: {
         title: 'Mix Chart',
@@ -39,9 +38,9 @@ let chartsRouter = [{
   ]
 }]
 
-let examplesRoutes = [{
+const examplesRoutes = [{
   path: '/example',
-  component: Layout,
+  component: () => import("@/views/dev-example/index"),
   redirect: '/example/list',
   name: 'Example',
   meta: {
@@ -50,7 +49,7 @@ let examplesRoutes = [{
   },
   children: [{
       path: 'create',
-      component: () => import('@/views/example/create'),
+      component: () => import('@/views/dev-example/example/create'),
       name: 'CreateArticle',
       meta: {
         title: 'Create Article',
@@ -59,7 +58,7 @@ let examplesRoutes = [{
     },
     {
       path: 'edit/:id(\\d+)',
-      component: () => import('@/views/example/edit'),
+      component: () => import('@/views/dev-example/example/edit'),
       name: 'EditArticle',
       meta: {
         title: 'Edit Article',
@@ -70,7 +69,7 @@ let examplesRoutes = [{
     },
     {
       path: 'list',
-      component: () => import('@/views/example/list'),
+      component: () => import('@/views/dev-example/example/list'),
       name: 'ArticleList',
       meta: {
         title: 'Article List',
@@ -80,9 +79,9 @@ let examplesRoutes = [{
   ]
 }];
 
-let componentsRouter = [{
+const componentsRouter = [{
   path: '/components',
-  component: Layout,
+  component: () => import("@/views/dev-example/index"),
   redirect: 'noRedirect',
   name: 'ComponentDemo',
   meta: {
@@ -91,7 +90,7 @@ let componentsRouter = [{
   },
   children: [{
       path: 'tinymce',
-      component: () => import('@/views/components-demo/tinymce'),
+      component: () => import('@/views/dev-example/components-demo/tinymce'),
       name: 'TinymceDemo',
       meta: {
         title: 'Tinymce'
@@ -99,7 +98,7 @@ let componentsRouter = [{
     },
     {
       path: 'markdown',
-      component: () => import('@/views/components-demo/markdown'),
+      component: () => import('@/views/dev-example/components-demo/markdown'),
       name: 'MarkdownDemo',
       meta: {
         title: 'Markdown'
@@ -107,7 +106,7 @@ let componentsRouter = [{
     },
     {
       path: 'json-editor',
-      component: () => import('@/views/components-demo/json-editor'),
+      component: () => import('@/views/dev-example/components-demo/json-editor'),
       name: 'JsonEditorDemo',
       meta: {
         title: 'JSON Editor'
@@ -115,7 +114,7 @@ let componentsRouter = [{
     },
     {
       path: 'split-pane',
-      component: () => import('@/views/components-demo/split-pane'),
+      component: () => import('@/views/dev-example/components-demo/split-pane'),
       name: 'SplitpaneDemo',
       meta: {
         title: 'SplitPane'
@@ -123,7 +122,7 @@ let componentsRouter = [{
     },
     {
       path: 'avatar-upload',
-      component: () => import('@/views/components-demo/avatar-upload'),
+      component: () => import('@/views/dev-example/components-demo/avatar-upload'),
       name: 'AvatarUploadDemo',
       meta: {
         title: 'Upload'
@@ -131,7 +130,7 @@ let componentsRouter = [{
     },
     {
       path: 'dropzone',
-      component: () => import('@/views/components-demo/dropzone'),
+      component: () => import('@/views/dev-example/components-demo/dropzone'),
       name: 'DropzoneDemo',
       meta: {
         title: 'Dropzone'
@@ -139,7 +138,7 @@ let componentsRouter = [{
     },
     {
       path: 'sticky',
-      component: () => import('@/views/components-demo/sticky'),
+      component: () => import('@/views/dev-example/components-demo/sticky'),
       name: 'StickyDemo',
       meta: {
         title: 'Sticky'
@@ -147,7 +146,7 @@ let componentsRouter = [{
     },
     {
       path: 'count-to',
-      component: () => import('@/views/components-demo/count-to'),
+      component: () => import('@/views/dev-example/components-demo/count-to'),
       name: 'CountToDemo',
       meta: {
         title: 'Count To'
@@ -155,7 +154,7 @@ let componentsRouter = [{
     },
     {
       path: 'mixin',
-      component: () => import('@/views/components-demo/mixin'),
+      component: () => import('@/views/dev-example/components-demo/mixin'),
       name: 'ComponentMixinDemo',
       meta: {
         title: 'Component Mixin'
@@ -163,7 +162,7 @@ let componentsRouter = [{
     },
     {
       path: 'back-to-top',
-      component: () => import('@/views/components-demo/back-to-top'),
+      component: () => import('@/views/dev-example/components-demo/back-to-top'),
       name: 'BackToTopDemo',
       meta: {
         title: 'Back To Top'
@@ -171,7 +170,7 @@ let componentsRouter = [{
     },
     {
       path: 'drag-dialog',
-      component: () => import('@/views/components-demo/drag-dialog'),
+      component: () => import('@/views/dev-example/components-demo/drag-dialog'),
       name: 'DragDialogDemo',
       meta: {
         title: 'Drag Dialog'
@@ -179,7 +178,7 @@ let componentsRouter = [{
     },
     {
       path: 'drag-select',
-      component: () => import('@/views/components-demo/drag-select'),
+      component: () => import('@/views/dev-example/components-demo/drag-select'),
       name: 'DragSelectDemo',
       meta: {
         title: 'Drag Select'
@@ -187,7 +186,7 @@ let componentsRouter = [{
     },
     {
       path: 'dnd-list',
-      component: () => import('@/views/components-demo/dnd-list'),
+      component: () => import('@/views/dev-example/components-demo/dnd-list'),
       name: 'DndListDemo',
       meta: {
         title: 'Dnd List'
@@ -195,7 +194,7 @@ let componentsRouter = [{
     },
     {
       path: 'drag-kanban',
-      component: () => import('@/views/components-demo/drag-kanban'),
+      component: () => import('@/views/dev-example/components-demo/drag-kanban'),
       name: 'DragKanbanDemo',
       meta: {
         title: 'Drag Kanban'
@@ -204,23 +203,65 @@ let componentsRouter = [{
   ]
 }];
 
-let othersRoutes = [{
+const othersRoutes = [{
   path: '/tab',
-  component: Layout,
+  component: () => import("@/views/dev-example/index"),
   children: [{
     path: 'index',
-    component: () => import('@/views/tab/index'),
+    component: () => import('@/views/dev-example/tab/index'),
     name: 'Tab',
     meta: {
       title: 'Tab',
       icon: 'tab'
     }
   }]
+}, {
+  path: '/icon',
+  component: () => import("@/views/dev-example/index"),
+  children: [{
+    path: 'index',
+    component: () => import('@/views/dev-example/icons/index'),
+    name: 'Icons',
+    meta: {
+      title: 'Icons',
+      icon: 'icon',
+      noCache: true
+    }
+  }]
+}, {
+  path: '/pdf',
+  component: () => import("@/views/dev-example/index"),
+  redirect: '/pdf/index',
+  children: [{
+    path: 'index',
+    component: () => import('@/views/dev-example/pdf/index'),
+    name: 'PDF',
+    meta: {
+      title: 'PDF',
+      icon: 'pdf'
+    }
+  }]
+}, {
+  path: '/pdf/download',
+  component: () => import('@/views/dev-example/pdf/download'),
+  hidden: true
+}, {
+  path: '/theme',
+  component: () => import("@/views/dev-example/index"),
+  children: [{
+    path: 'index',
+    component: () => import('@/views/dev-example/theme/index'),
+    name: 'Theme',
+    meta: {
+      title: 'Theme',
+      icon: 'theme'
+    }
+  }]
 }]
 
-let nestedRouter = [{
+const nestedRouter = [{
   path: '/nested',
-  component: Layout,
+  component: () => import("@/views/dev-example/index"),
   redirect: '/nested/menu1/menu1-1',
   name: 'Nested',
   meta: {
@@ -229,7 +270,7 @@ let nestedRouter = [{
   },
   children: [{
       path: 'menu1',
-      component: () => import('@/views/nested/menu1/index'), // Parent router-view
+      component: () => import('@/views/dev-example/nested/menu1/index'), // Parent router-view
       name: 'Menu1',
       meta: {
         title: 'Menu 1'
@@ -237,7 +278,7 @@ let nestedRouter = [{
       redirect: '/nested/menu1/menu1-1',
       children: [{
           path: 'menu1-1',
-          component: () => import('@/views/nested/menu1/menu1-1'),
+          component: () => import('@/views/dev-example/nested/menu1/menu1-1'),
           name: 'Menu1-1',
           meta: {
             title: 'Menu 1-1'
@@ -245,7 +286,7 @@ let nestedRouter = [{
         },
         {
           path: 'menu1-2',
-          component: () => import('@/views/nested/menu1/menu1-2'),
+          component: () => import('@/views/dev-example/nested/menu1/menu1-2'),
           name: 'Menu1-2',
           redirect: '/nested/menu1/menu1-2/menu1-2-1',
           meta: {
@@ -253,7 +294,7 @@ let nestedRouter = [{
           },
           children: [{
               path: 'menu1-2-1',
-              component: () => import('@/views/nested/menu1/menu1-2/menu1-2-1'),
+              component: () => import('@/views/dev-example/nested/menu1/menu1-2/menu1-2-1'),
               name: 'Menu1-2-1',
               meta: {
                 title: 'Menu 1-2-1'
@@ -261,7 +302,7 @@ let nestedRouter = [{
             },
             {
               path: 'menu1-2-2',
-              component: () => import('@/views/nested/menu1/menu1-2/menu1-2-2'),
+              component: () => import('@/views/dev-example/nested/menu1/menu1-2/menu1-2-2'),
               name: 'Menu1-2-2',
               meta: {
                 title: 'Menu 1-2-2'
@@ -271,7 +312,7 @@ let nestedRouter = [{
         },
         {
           path: 'menu1-3',
-          component: () => import('@/views/nested/menu1/menu1-3'),
+          component: () => import('@/views/dev-example/nested/menu1/menu1-3'),
           name: 'Menu1-3',
           meta: {
             title: 'Menu 1-3'
@@ -282,7 +323,7 @@ let nestedRouter = [{
     {
       path: 'menu2',
       name: 'Menu2',
-      component: () => import('@/views/nested/menu2/index'),
+      component: () => import('@/views/dev-example/nested/menu2/index'),
       meta: {
         title: 'Menu 2'
       }
@@ -292,7 +333,7 @@ let nestedRouter = [{
 
 const tablesRouter = [{
   path: '/table',
-  component: Layout,
+  component: () => import("@/views/dev-example/index"),
   redirect: '/table/complex-table',
   name: 'Table',
   meta: {
@@ -301,7 +342,7 @@ const tablesRouter = [{
   },
   children: [{
       path: 'dynamic-table',
-      component: () => import('@/views/table/dynamic-table/index'),
+      component: () => import('@/views/dev-example/table/dynamic-table/index'),
       name: 'DynamicTable',
       meta: {
         title: 'Dynamic Table'
@@ -309,7 +350,7 @@ const tablesRouter = [{
     },
     {
       path: 'drag-table',
-      component: () => import('@/views/table/drag-table'),
+      component: () => import('@/views/dev-example/table/drag-table'),
       name: 'DragTable',
       meta: {
         title: 'Drag Table'
@@ -317,7 +358,7 @@ const tablesRouter = [{
     },
     {
       path: 'inline-edit-table',
-      component: () => import('@/views/table/inline-edit-table'),
+      component: () => import('@/views/dev-example/table/inline-edit-table'),
       name: 'InlineEditTable',
       meta: {
         title: 'Inline Edit'
@@ -325,7 +366,7 @@ const tablesRouter = [{
     },
     {
       path: 'complex-table',
-      component: () => import('@/views/table/complex-table'),
+      component: () => import('@/views/dev-example/table/complex-table'),
       name: 'ComplexTable',
       meta: {
         title: 'Complex Table'
@@ -334,13 +375,129 @@ const tablesRouter = [{
   ]
 }];
 
-const developsRouter = [
-  ...chartsRouter,
-  ...examplesRoutes,
-  ...othersRoutes,
-  ...componentsRouter,
-  ...nestedRouter,
-  ...tablesRouter
-];
+const execlsRouter = [{
+  path: '/excel',
+  component: () => import("@/views/dev-example/index"),
+  redirect: '/excel/export-excel',
+  name: 'Excel',
+  meta: {
+    title: 'Excel',
+    icon: 'excel'
+  },
+  children: [{
+      path: 'export-excel',
+      component: () => import('@/views/dev-example/excel/export-excel'),
+      name: 'ExportExcel',
+      meta: {
+        title: 'Export Excel'
+      }
+    },
+    {
+      path: 'export-selected-excel',
+      component: () => import('@/views/dev-example/excel/select-excel'),
+      name: 'SelectExcel',
+      meta: {
+        title: 'Export Selected'
+      }
+    },
+    {
+      path: 'export-merge-header',
+      component: () => import('@/views/dev-example/excel/merge-header'),
+      name: 'MergeHeader',
+      meta: {
+        title: 'Merge Header'
+      }
+    },
+    {
+      path: 'upload-excel',
+      component: () => import('@/views/dev-example/excel/upload-excel'),
+      name: 'UploadExcel',
+      meta: {
+        title: 'Upload Excel'
+      }
+    }
+  ]
+}];
 
+const zipsRouter = [{
+  path: '/zip',
+  component: () => import("@/views/dev-example/index"),
+  redirect: '/zip/download',
+  alwaysShow: true,
+  name: 'Zip',
+  meta: {
+    title: 'Zip',
+    icon: 'zip'
+  },
+  children: [{
+    path: 'download',
+    component: () => import('@/views/dev-example/zip/index'),
+    name: 'ExportZip',
+    meta: {
+      title: 'Export Zip'
+    }
+  }]
+}]
+
+const errorsRouter = [{
+  path: '/error',
+  component: () => import("@/views/dev-example/index"),
+  redirect: 'noRedirect',
+  name: 'ErrorPages',
+  meta: {
+    title: 'Error Pages',
+    icon: '404'
+  },
+  children: [{
+      path: '401',
+      component: () => import('@/views/error-page/401'),
+      name: 'Page401',
+      meta: {
+        title: '401',
+        noCache: true
+      }
+    },
+    {
+      path: '404',
+      component: () => import('@/views/error-page/404'),
+      name: 'Page404',
+      meta: {
+        title: '404',
+        noCache: true
+      }
+    }
+  ]
+}]
+
+const developsRouter = {
+  path: "/dev-example",
+  component: Layout,
+  redirect: "/dev-example/documentation/index",
+  alwaysShow: true,
+  name: "Developer",
+  meta: {
+    title: "Developer",
+    icon: "documentation"
+  },
+  children: [{
+      path: "documentation/index",
+      component: () => import("@/views/dev-example/documentation/index"),
+      name: "Documentation",
+      meta: {
+        title: "Documentation",
+        icon: "documentation"
+      }
+    },
+    ...chartsRouter,
+    ...examplesRoutes,
+    ...othersRoutes,
+    ...componentsRouter,
+    ...nestedRouter,
+    ...tablesRouter,
+    ...execlsRouter,
+    ...zipsRouter,
+    ...errorsRouter
+  ]
+};
+console.log(developsRouter);
 export default developsRouter;

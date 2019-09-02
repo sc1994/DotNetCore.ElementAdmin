@@ -20,10 +20,12 @@ export function filterAsyncRoutes(routes) {
     if (tmp.children) {
       tmp.children = filterAsyncRoutes(tmp.children)
     }
-    if (user.state.menus.indexOf(tmp.name) > -1 || (tmp.children || []).length > 0) {
+    if (user.state.menus.indexOf(tmp.name) > -1 ||
+      (tmp.children || []).length > 0 ||
+      tmp.redirect == "/404" ||
+      tmp.redirect == "/401") {
       res.push(tmp)
     }
-
   })
 
   return res
@@ -37,14 +39,15 @@ const state = {
 const mutations = {
   SET_ROUTES: (state, routes) => {
     state.addRoutes = routes
-    state.routes = constantRoutes.concat(routes)
+    var routes = constantRoutes.concat(routes)
+    state.routes = routes;
   }
 }
 
 const actions = {
   generateRoutes({
     commit
-  }, roles) {
+  }) {
     return new Promise(resolve => {
       let accessedRoutes = filterAsyncRoutes(asyncRoutes)
       commit('SET_ROUTES', accessedRoutes)

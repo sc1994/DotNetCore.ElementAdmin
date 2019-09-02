@@ -83,7 +83,7 @@ const actions = {
         }
 
         // const roles = result.user.grantedRoles;
-        const roles = ["admin"];
+        const roles = result.user.grantedRoles;
         const menus = result.user.grantedMenus;
         const name = result.user.name
         const avatar = 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif' // TODO:
