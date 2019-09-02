@@ -177,7 +177,6 @@ export const asyncRoutes = [{
   {
     path: '/icon',
     component: Layout,
-    alwaysShow: true,
     children: [{
       path: 'index',
       component: () => import('@/views/icons/index'),
