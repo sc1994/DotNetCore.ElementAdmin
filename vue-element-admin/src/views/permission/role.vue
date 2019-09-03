@@ -118,19 +118,9 @@ export default {
   },
   computed: {
     routesData() {
-      let map = x => {
-        return {
-          meta: x.meta,
-          children: x.children,
-          key: x.name
-        };
-      };
       let routes = this.routes
         .map(x => {
-          if (x.hidden) return null;
-          if (!x.meta && x.children && x.children.length > 0)
-            return map(x.children[0]);
-          return map(x);
+          return this.getChildren(x);
         })
         .filter(x => x);
       return this.routeDataMap(routes);
@@ -163,6 +153,25 @@ export default {
         id: source.id,
         grantedMenus: this.$refs.tree.getCheckedKeys()
       };
+    },
+    getChildren(x) {
+      let map = x => {
+        return {
+          meta: x.meta,
+          children: x.children,
+          key: x.name
+        };
+      };
+      if (!x) return undefined;
+      if (x.hidden) return undefined;
+      
+      if (!x.meta && x.children && x.children.length > 0) {
+        var c = this.getChildren(x.children[0]);
+        return map(c);
+      } else if (x.meta) {
+        return map(x);
+      }
+      return undefined;
     },
     async getRoles(page = 1) {
       const { result } = await getRoles(page);
@@ -241,9 +250,14 @@ export default {
     routeDataMap(routes) {
       let result = [];
       for (let route of routes) {
+        var key =
+          route.key || route.name || (route.meta && route.meta.title) || "";
+        if (!key) {
+          continue;
+        }
         let t = {
           meta: route.meta,
-          key: route.key || route.name || route.meta.title
+          key
         };
         if (route.children) {
           t.children = this.routeDataMap(route.children);

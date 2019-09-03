@@ -39,7 +39,7 @@ const chartsRouter = [{
 }]
 
 const examplesRoutes = [{
-  path: '/example',
+  path: 'example',
   component: () => import("@/views/dev-example/index"),
   redirect: '/example/list',
   name: 'Example',
@@ -80,7 +80,7 @@ const examplesRoutes = [{
 }];
 
 const componentsRouter = [{
-  path: '/components',
+  path: 'components',
   component: () => import("@/views/dev-example/index"),
   redirect: 'noRedirect',
   name: 'ComponentDemo',
@@ -204,63 +204,54 @@ const componentsRouter = [{
 }];
 
 const othersRoutes = [{
-  path: '/tab',
-  component: () => import("@/views/dev-example/index"),
-  children: [{
-    path: 'index',
-    component: () => import('@/views/dev-example/tab/index'),
-    name: 'Tab',
-    meta: {
-      title: 'Tab',
-      icon: 'tab'
-    }
-  }]
+  path: 'tab/index',
+  component: () => import('@/views/dev-example/tab/index'),
+  name: 'Tab',
+  meta: {
+    title: 'Tab',
+    icon: 'tab'
+  }
 }, {
-  path: '/icon',
-  component: () => import("@/views/dev-example/index"),
-  children: [{
-    path: 'index',
-    component: () => import('@/views/dev-example/icons/index'),
-    name: 'Icons',
-    meta: {
-      title: 'Icons',
-      icon: 'icon',
-      noCache: true
-    }
-  }]
+  path: 'icon/index',
+  component: () => import('@/views/dev-example/icons/index'),
+  name: 'Icons',
+  meta: {
+    title: 'Icons',
+    icon: 'icon',
+    noCache: true
+  }
 }, {
-  path: '/pdf',
-  component: () => import("@/views/dev-example/index"),
-  redirect: '/pdf/index',
-  children: [{
-    path: 'index',
-    component: () => import('@/views/dev-example/pdf/index'),
-    name: 'PDF',
-    meta: {
-      title: 'PDF',
-      icon: 'pdf'
-    }
-  }]
+  path: 'pdf/index',
+  component: () => import('@/views/dev-example/pdf/index'),
+  name: 'PDF',
+  meta: {
+    title: 'PDF',
+    icon: 'pdf'
+  }
 }, {
-  path: '/pdf/download',
+  path: 'pdf/download',
   component: () => import('@/views/dev-example/pdf/download'),
   hidden: true
 }, {
-  path: '/theme',
-  component: () => import("@/views/dev-example/index"),
-  children: [{
-    path: 'index',
-    component: () => import('@/views/dev-example/theme/index'),
-    name: 'Theme',
-    meta: {
-      title: 'Theme',
-      icon: 'theme'
-    }
-  }]
+  path: 'theme/index',
+  component: () => import('@/views/dev-example/theme/index'),
+  name: 'Theme',
+  meta: {
+    title: 'Theme',
+    icon: 'theme'
+  }
+}, {
+  path: 'zip/download',
+  component: () => import('@/views/dev-example/zip/index'),
+  name: 'ExportZip',
+  meta: {
+    title: 'Export Zip',
+    icon: 'zip'
+  }
 }]
 
 const nestedRouter = [{
-  path: '/nested',
+  path: 'nested',
   component: () => import("@/views/dev-example/index"),
   redirect: '/nested/menu1/menu1-1',
   name: 'Nested',
@@ -332,7 +323,7 @@ const nestedRouter = [{
 }];
 
 const tablesRouter = [{
-  path: '/table',
+  path: 'table',
   component: () => import("@/views/dev-example/index"),
   redirect: '/table/complex-table',
   name: 'Table',
@@ -376,7 +367,7 @@ const tablesRouter = [{
 }];
 
 const execlsRouter = [{
-  path: '/excel',
+  path: 'excel',
   component: () => import("@/views/dev-example/index"),
   redirect: '/excel/export-excel',
   name: 'Excel',
@@ -419,28 +410,8 @@ const execlsRouter = [{
   ]
 }];
 
-const zipsRouter = [{
-  path: '/zip',
-  component: () => import("@/views/dev-example/index"),
-  redirect: '/zip/download',
-  alwaysShow: true,
-  name: 'Zip',
-  meta: {
-    title: 'Zip',
-    icon: 'zip'
-  },
-  children: [{
-    path: 'download',
-    component: () => import('@/views/dev-example/zip/index'),
-    name: 'ExportZip',
-    meta: {
-      title: 'Export Zip'
-    }
-  }]
-}]
-
 const errorsRouter = [{
-  path: '/error',
+  path: 'error',
   component: () => import("@/views/dev-example/index"),
   redirect: 'noRedirect',
   name: 'ErrorPages',
@@ -469,6 +440,33 @@ const errorsRouter = [{
   ]
 }]
 
+const logsRouter = [
+  //   {
+  //   path: 'logs',
+  //   component: () => import("@/views/dev-example/index"),
+  //   name: 'Logs',
+  //   meta: {
+  //     title: 'Logs',
+  //     icon: "bug"
+  //   },
+  //   children: [{
+  //     path: 'host',
+  //     component: () => import('@/views/error-log/index'),
+  //     name: 'HostLog',
+  //     meta: {
+  //       title: 'Host Log',
+  //     }
+  //   }, {
+  //     path: 'page',
+  //     component: () => import('@/views/error-log/index'),
+  //     name: 'ErrorLog',
+  //     meta: {
+  //       title: 'Page Error Log',
+  //     }
+  //   }]
+  // }
+]
+
 const developsRouter = {
   path: "/dev-example",
   component: Layout,
@@ -488,14 +486,14 @@ const developsRouter = {
         icon: "documentation"
       }
     },
+    ...logsRouter,
     ...chartsRouter,
     ...examplesRoutes,
-    ...othersRoutes,
     ...componentsRouter,
     ...nestedRouter,
     ...tablesRouter,
     ...execlsRouter,
-    ...zipsRouter,
+    ...othersRoutes,
     ...errorsRouter
   ]
 };
