@@ -96,6 +96,18 @@ namespace DotNetCore.ElementAdmin.SystemLogs.Elasticsearch
 
         [JsonProperty("match", NullValueHandling = NullValueHandling.Ignore)]
         public ElasticsearchMatch Match { get; set; }
+
+        [JsonProperty("prefix", NullValueHandling = NullValueHandling.Ignore)]
+        public ElasticsearchPrefix Prefix { get; set; }
+    }
+
+    public class ElasticsearchPrefix
+    {
+        [JsonProperty("fields.RequestPath.keyword", NullValueHandling = NullValueHandling.Ignore)]
+        public string FieldsRequestPathKeyword { get; set; }
+
+        [JsonProperty("fields.SourceContext.keyword", NullValueHandling = NullValueHandling.Ignore)]
+        public string FieldsSourceContextKeyword { get; set; }
     }
 
     public class ElasticsearchMatch
@@ -110,7 +122,7 @@ namespace DotNetCore.ElementAdmin.SystemLogs.Elasticsearch
 
     public partial class ElasticsearchRange
     {
-        [JsonProperty("@timestamp")]
+        [JsonProperty("@timestamp", NullValueHandling = NullValueHandling.Ignore)]
         public ElasticsearchTimestamp Timestamp { get; set; }
     }
 

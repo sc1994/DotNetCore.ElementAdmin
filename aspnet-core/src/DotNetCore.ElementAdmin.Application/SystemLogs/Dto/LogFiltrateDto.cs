@@ -7,13 +7,16 @@ namespace DotNetCore.ElementAdmin.SystemLogs.Dto
     using Newtonsoft.Json;
     using Newtonsoft.Json.Converters;
 
-    public partial class LogFiltrateDto
+    public partial class LogFiltrateInputDto
     {
         [JsonProperty("times")]
         public DateTimeOffset[] Times { get; set; }
 
-        [JsonProperty("classifies")]
-        public string[] Classifies { get; set; }
+        [JsonProperty("requestPath")]
+        public string[] RequestPath { get; set; }
+
+        [JsonProperty("context")]
+        public string[] Context { get; set; }
 
         [JsonProperty("filter1")]
         public string Filter1 { get; set; }
@@ -40,7 +43,7 @@ namespace DotNetCore.ElementAdmin.SystemLogs.Dto
         [JsonConverter(typeof(ParseStringConverter))]
         public long PageSize { get; set; }
 
-        public static LogFiltrateDto FromJson(string json) => JsonConvert.DeserializeObject<LogFiltrateDto>(json, Converter.Settings);
+        public static LogFiltrateInputDto FromJson(string json) => JsonConvert.DeserializeObject<LogFiltrateInputDto>(json, Converter.Settings);
 
         internal static class Converter
         {

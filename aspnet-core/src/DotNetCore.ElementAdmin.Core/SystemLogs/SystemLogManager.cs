@@ -22,20 +22,11 @@ namespace DotNetCore.ElementAdmin.Core.SystemLogs
             _log = log;
         }
 
-        public async Task<(ElasticsearchBucket[] messageTemplate, ElasticsearchBucket[] content, ElasticsearchBucket[] requestPath)> GetAggregation(Elasticsearch input)
+        public async Task<(ElasticsearchBucket[] messageTemplate, ElasticsearchBucket[] context, ElasticsearchBucket[] requestPath)> GetAggregation(Elasticsearch input)
         {
             var count = 0;
         Again:
-            var timeRange = input.Query.Bool.Must.FirstOrDefault(
-                x => x.Range?.Timestamp?.Gt != null && x.Range?.Timestamp?.Lt != null
-            ).Range.Timestamp;
-
-            var index = GetIndexs(timeRange.Gt.Value.DateTime, timeRange.Lt.Value.DateTime);
-
-            var response = await $"{_elasticsearchPath}/{index}/logevent/_search"
-                                    .WithHeader("Content-Type", "application/json")
-                                    .PostStringAsync(input.ToJson());
-            var resultStr = await response.Content.ReadAsStringAsync();
+            var resultStr = await ToSearchAsync(input);
 
             var result = JsonConvert.DeserializeObject<ElasticsearchAggregations>(resultStr);
             if (result.Shards != null && result.Shards.Failed > 0)
@@ -75,14 +66,45 @@ namespace DotNetCore.ElementAdmin.Core.SystemLogs
                 }
             }
             return (
-                result.Aggregations["aggMessageTemplate"].Buckets,
+                null, // result.Aggregations["aggMessageTemplate"].Buckets, 暂不查询
                 result.Aggregations["aggSourceContext"].Buckets,
                 result.Aggregations["aggRequestPath"].Buckets
             );
         }
 
-        private string GetIndexs(DateTime start, DateTime end)
+        public async Task<string> GetSearch(Elasticsearch input)
         {
+            return await ToSearchAsync(input);
+        }
+
+        private async Task<string> ToSearchAsync(Elasticsearch input)
+        {
+            var index = GetIndexs(input);
+            var request = input.ToJson();
+            var url = $"{_elasticsearchPath}/{index}/logevent/_search";
+            var response = await $"{_elasticsearchPath}/{index}/logevent/_search"
+                                    .WithHeader("Content-Type", "application/json")
+                                    .PostStringAsync(input.ToJson());
+            _log.LogInformation("Send {request} To {url}", new object[] { request, url });
+            return await response.Content.ReadAsStringAsync();
+        }
+
+        private string GetIndexs(Elasticsearch input)
+        {
+            var timeRange = input.Query.Bool.Must.FirstOrDefault(
+                x => x.Range?.Timestamp?.Gt != null && x.Range?.Timestamp?.Lt != null
+            ).Range.Timestamp;
+
+
+            if (timeRange == null ||
+                (timeRange.Gt - timeRange.Lt).Value.TotalDays > 10)
+            {
+                return $"logstash-.*";
+            }
+
+            var start = timeRange.Gt.Value.DateTime;
+            var end = timeRange.Lt.Value.DateTime;
+
             var index = string.Empty;
             var tempDate = start.Date;
             do
@@ -91,10 +113,7 @@ namespace DotNetCore.ElementAdmin.Core.SystemLogs
                 tempDate = tempDate.AddDays(1);
             }
             while (tempDate <= end.Date && tempDate <= DateTime.Today);
-            if (index.Length > 300) // TODO: 防止太长
-            {
-                index = $"logstash-{end:yyyy.MM}.*";
-            }
+
             return index.TrimEnd(',');
         }
     }

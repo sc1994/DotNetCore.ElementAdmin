@@ -2,23 +2,28 @@
   <div class="app-container">
     <el-card class="box-card" shadow="hover" style>
       <el-row :gutter="5">
-        <el-col :span="1">Content&nbsp;</el-col>
-        <el-col :span="11">
+        <el-col :span="2">Request Path&nbsp;</el-col>
+        <el-col :span="10">
           <el-cascader
-            :options="classifies"
+            :options="requestPath"
             clearable
             style="width:100%"
             filterable
             :debounce="500"
             :filter-method="cascaderFilterMethod"
-            v-model="filtrate.classifies"
-            placeholder="Log Content"
+            v-model="filtrate.requestPath"
+            placeholder="Select Request Path"
             :props="{ checkStrictly: true }"
-          ></el-cascader>
+          >
+            <template slot-scope="{ node, data }">
+              <span>{{ data.label }}</span>
+              &nbsp;({{ data.docCount }})
+            </template>
+          </el-cascader>
         </el-col>
-        <!-- <el-col :span="2">级别：</el-col>
+        <el-col :span="1">Level</el-col>
         <el-col :span="3">
-          <el-select v-model="filtrate.lv" clearable>
+          <el-select v-model="filtrate.lv" clearable placeholder="Select Level">
             <el-option label="Information" value="Information"></el-option>
             <el-option label="Warning" value="Warning"></el-option>
             <el-option label="Error" value="Error"></el-option>
@@ -26,29 +31,31 @@
             <el-option label="Fatal" value="Fatal"></el-option>
           </el-select>
         </el-col>
-        <el-col :span="1">时间：</el-col>
+        <el-col :span="2">Time Range</el-col>
         <el-col :span="6">
           <el-date-picker
             v-if="switchTime"
             v-model="filtrate.times"
             type="datetimerange"
-            range-separator="至"
-            start-placeholder="开始日期"
-            end-placeholder="结束日期"
+            range-separator="~"
+            start-placeholder="Start Time"
+            end-placeholder="End Time"
             align="right"
-            value-format="yyyy-MM-dd HH:mm:ss"
+            format="yyyy-MM-dd HH:mm"
+            value-format="yyyy-MM-dd HH:mm"
+            style="width:83%"
           ></el-date-picker>
           <el-select v-else v-model="filtrate.timeSelect">
-            <el-option label="最近10分钟" value="10"></el-option>
-            <el-option label="最近30分钟" value="30"></el-option>
-            <el-option label="最近1小时" value="60"></el-option>
-            <el-option label="最近8小时" value="480"></el-option>
+            <el-option label="lately 10 minute" value="10"></el-option>
+            <el-option label="lately 30 minute" value="30"></el-option>
+            <el-option label="lately 1 hour" value="60"></el-option>
+            <el-option label="lately 8 hour" value="480"></el-option>
           </el-select>
           <el-button icon="el-icon-full-screen" circle @click="switchTime = !switchTime"></el-button>
         </el-col>
       </el-row>
       <br />
-      <el-row :gutter="5">
+      <!-- 
         <el-col :span="1">过滤：</el-col>
         <el-col :span="3">
           <el-input v-model="filtrate.filter1" placeholder="过滤1"></el-input>
@@ -61,12 +68,33 @@
           <el-select v-model="filtrate.ip" clearable style="width:100%">
             <el-option v-for="item in ips" :key="item" :label="item" :value="item"></el-option>
           </el-select>
-        </el-col> -->
-        <el-col :span="2">KeyWord&nbsp;</el-col>
+      </el-col>-->
+
+      <el-row :gutter="5">
+        <el-col :span="2">Context&nbsp;</el-col>
+        <el-col :span="10">
+          <el-cascader
+            :options="context"
+            clearable
+            style="width:100%"
+            filterable
+            :debounce="500"
+            :filter-method="cascaderFilterMethod"
+            v-model="filtrate.context"
+            placeholder="Select Context"
+            :props="{ checkStrictly: true }"
+          >
+            <template slot-scope="{ node, data }">
+              <span>{{ data.label }}</span>
+              &nbsp;({{ data.docCount }})
+            </template>
+          </el-cascader>
+        </el-col>
+        <el-col :span="1">Search</el-col>
         <el-col :span="10">
           <el-input
             v-model="filtrate.msg"
-            placeholder="此项将会扰乱时间顺序, 以输入内容的匹配度为排序依据! 请严格限制时间范围, 否则搜索结果将偏差较多"
+            placeholder="This will disrupt the chronological order of the input based on how well it matches!Please strictly limit the time range, otherwise the search results will be more deviation"
           ></el-input>
         </el-col>
       </el-row>
@@ -77,7 +105,7 @@
           icon="el-icon-filtrate"
           @click="search(1)"
           :loading="loading && !autoRefresh"
-        >搜索</el-button>
+        >Search</el-button>
         <el-button
           type="primary"
           icon="el-icon-refresh rotate"
@@ -88,7 +116,7 @@
         <el-button type="primary" icon="el-icon-refresh" @click="autoRefresh = true" v-else></el-button>
       </el-row>
     </el-card>
-    <el-divider content-position="left">搜索结果</el-divider>
+    <el-divider content-position="left">Search Result</el-divider>
     <el-table
       :data="tableData"
       border
@@ -98,38 +126,33 @@
       :row-class-name="tableRowClassName"
     >
       >
-      <el-table-column prop="timestamp" label="时间" width="195"></el-table-column>
-      <el-table-column prop="level" label="等级" width="120">
+      <el-table-column prop="timestamp" label="Time" width="165"></el-table-column>
+      <el-table-column prop="level" label="Level" width="110">
         <template slot-scope="scope">
           <span>{{scope.row.level}}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="module" label="项目/模块/大类/小类" width="600">
+      <el-table-column prop="RequestPath" label="RequestPath" width="280">
         <template slot-scope="scope">
-          <span
-            class="span-long-text"
-            :title="scope.row.app + '/' + scope.row.module + '/' + scope.row.category + '/' +
-                        scope.row.sub_category"
-          >
-            <span>{{scope.row.app}}</span>/
-            <span>{{scope.row.module}}</span>/
-            <span>{{scope.row.category}}</span>/
-            <span>{{scope.row.sub_category}}</span>
-          </span>
+          <span class="span-long-text" :title="scope.row.RequestPath">{{scope.row.RequestPath}}</span>
         </template>
       </el-table-column>
-
-      <el-table-column prop="msg" label="Msg">
+      <el-table-column prop="module" label="Context" width="380">
         <template slot-scope="scope">
-          <span
+          <span class="span-long-text" :title="scope.row.SourceContext">{{scope.row.SourceContext}}</span>
+        </template>
+      </el-table-column>
+      <el-table-column prop="message" label="Message">
+        <template slot-scope="scope">
+          <!-- <span
             class="span-long-text"
             v-if="scope.row['fields.msg'] && scope.row['fields.msg'][0]"
             v-html="scope.row['fields.msg'][0]"
-          ></span>
-          <span class="span-long-text" v-else>{{scope.row.msg}}</span>
+          ></span> TODO:不知道干嘛的逻辑-->
+          <span class="span-long-text">{{scope.row.message}}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="ip" label="Ip" width="150"></el-table-column>
+      <el-table-column prop="RequestId" label="RequestId" width="220"></el-table-column>
     </el-table>
     <div style="padding: 20px;text-align: right">
       <el-pagination
@@ -172,6 +195,9 @@
   </div>
 </template>
 <script>
+import { postAggregation, postSearch } from "@/api/system-log";
+import { parseTime } from "@/utils";
+
 export default {
   data() {
     return {
@@ -180,7 +206,8 @@ export default {
         timeSelect: "10"
       },
       switchTime: false,
-      classifies: [],
+      requestPath: [],
+      context: [],
       ips: [],
       tableData: [],
       total: 0,
@@ -197,25 +224,24 @@ export default {
     async search(pageIndex) {
       this.currentPage = pageIndex;
       this.loading = true;
-      var res = await axios.post("api/search", {
+      var { result } = await postSearch({
         ...this.filtrate,
-        pageIndex,
-        pageSize: this.pageSize
+        pageSize: this.pageSize,
+        pageIndex
       });
-      var content = res.data[0];
+      var content = JSON.parse(result);
+      console.log(content);
       this.tableData = content.hits.hits.map(x => {
         return {
-          timestamp: new Date(x._source["@timestamp"]).format(
-            "yyyy-MM-dd hh:mm:ss.S"
-          ),
+          timestamp: parseTime(x._source["@timestamp"]),
           level: x._source.level,
+          message: x._source.message,
           ...x._source.fields,
           ...x.highlight
         };
       });
       this.total = content.hits.total;
       this.loading = false;
-      console.log(res.data);
     },
     showDetail(row, column, event) {
       this.dialogVisible = true;
@@ -250,6 +276,12 @@ export default {
       var result =
         where.filter(x => x.indexOf(keyword.toLowerCase()) > -1).length > 0;
       return result;
+    },
+    async getAggregation() {
+      var { result } = await postAggregation(this.filtrate);
+      console.log(result);
+      this.requestPath = result.requestPath;
+      this.context = result.context;
     }
   },
   watch: {
@@ -272,13 +304,20 @@ export default {
     },
     dialogVisible() {
       $("textarea").scrollTop(0);
+    },
+    "filtrate.timeSelect"(val) {
+      if (val > 0) this.getAggregation();
+    },
+    "filtrate.times"(val) {
+      if (val.length == 2) this.getAggregation();
+    },
+    "filtrate.lv"(val) {
+      this.getAggregation();
     }
   },
   async mounted() {
-    // var res = await axios.get("api/search/aggregation");
-    // this.classifies = res.data.item1;
-    // this.ips = res.data.item2;
-    // await this.search(1); // todo 测试
+    await this.getAggregation();
+    await this.search(1);
   }
 };
 </script>
