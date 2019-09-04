@@ -1,13 +1,16 @@
 using System.Linq;
+using Abp.Authorization;
 using System.Threading.Tasks;
+using Abp.Domain.Repositories;
 using Abp.Application.Services;
 using Abp.Application.Services.Dto;
-using Abp.Domain.Repositories;
-using DotNetCore.ElementAdmin.Application.Menus.Dto;
+using DotNetCore.ElementAdmin.Authorization;
 using DotNetCore.ElementAdmin.Authorization.Menus;
+using DotNetCore.ElementAdmin.Application.Menus.Dto;
 
 namespace DotNetCore.ElementAdmin.Application.Menus
 {
+    [AbpAuthorize(PermissionNames.Pages_Roles)]
     public class MenuAppService : AsyncCrudAppService<Menu, MenuDto, long, PagedMenuResultRequestDto, MenuDto, MenuDto>, IMenuAppService
     {
         private readonly IRepository<Menu, long> _repository;

@@ -49,7 +49,12 @@ const actions = {
     commit
   }) {
     return new Promise(resolve => {
-      let accessedRoutes = filterAsyncRoutes(asyncRoutes)
+      let accessedRoutes
+      if (user.state.roles.indexOf("ADMIN" > -1)) {
+        accessedRoutes = asyncRoutes;
+      } else {
+        accessedRoutes = filterAsyncRoutes(asyncRoutes)
+      }
       commit('SET_ROUTES', accessedRoutes)
       resolve(accessedRoutes)
     })

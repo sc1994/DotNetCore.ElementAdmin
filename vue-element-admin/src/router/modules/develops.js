@@ -440,32 +440,31 @@ const errorsRouter = [{
   ]
 }]
 
-const logsRouter = [
-  //   {
-  //   path: 'logs',
-  //   component: () => import("@/views/dev-example/index"),
-  //   name: 'Logs',
-  //   meta: {
-  //     title: 'Logs',
-  //     icon: "bug"
-  //   },
-  //   children: [{
-  //     path: 'host',
-  //     component: () => import('@/views/error-log/index'),
-  //     name: 'HostLog',
-  //     meta: {
-  //       title: 'Host Log',
-  //     }
-  //   }, {
-  //     path: 'page',
-  //     component: () => import('@/views/error-log/index'),
-  //     name: 'ErrorLog',
-  //     meta: {
-  //       title: 'Page Error Log',
-  //     }
-  //   }]
-  // }
-]
+const logsRouter = [{
+  path: 'logs',
+  component: () => import("@/views/dev-example/index"),
+  alwaysShow: true,
+  name: 'Logs',
+  meta: {
+    title: 'Logs',
+    icon: "bug"
+  },
+  children: [{
+    path: 'host',
+    component: () => import('@/views/dev-example/system-logs/host'),
+    name: 'HostLogs',
+    meta: {
+      title: 'Host Log',
+    }
+  }, {
+    path: 'page',
+    component: () => import('@/views/dev-example/system-logs/page'),
+    name: 'ErrorLogs',
+    meta: {
+      title: 'Page Error Log',
+    }
+  }]
+}]
 
 const developsRouter = {
   path: "/dev-example",
