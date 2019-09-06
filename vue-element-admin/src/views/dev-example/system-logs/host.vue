@@ -44,6 +44,8 @@
             format="yyyy-MM-dd HH:mm"
             value-format="yyyy-MM-dd HH:mm"
             style="width:83%"
+            :picker-options="dateTimePickerOptions"
+            :clearable="false"
           ></el-date-picker>
           <el-select v-else v-model="filtrate.timeSelect">
             <el-option label="lately 10 minute" value="10"></el-option>
@@ -186,7 +188,11 @@
   </div>
 </template>
 <script>
-import { postAggregation, postSearch } from "@/api/system-log";
+import {
+  postAggregation,
+  postSearch,
+  getAllIndexTimes
+} from "@/api/system-log";
 import { parseTime } from "@/utils";
 import JsonEditor from "@/components/JsonEditor";
 
@@ -209,7 +215,11 @@ export default {
       pageSize: 5,
       autoRefresh: false,
       timer: {},
-      loading: false
+      loading: false,
+      dateTimeRangeLimit: [],
+      dateTimePickerOptions: {
+        disabledDate: this.disabledDate
+      }
     };
   },
   components: { JsonEditor },
@@ -278,6 +288,23 @@ export default {
       console.log(result);
       this.requestPath = result.requestPath;
       this.context = result.context;
+    },
+    async getAllIndexTimes() {
+      var { result } = await getAllIndexTimes();
+      console.log(result);
+      this.dateTimeRangeLimit = result;
+      this.filtrate.times = [...this.dateTimeRangeLimit];
+    },
+    disabledDate(current) {
+      if (this.dateTimeRangeLimit.length == 2) {
+        if (
+          new Date(current) >= new Date(this.dateTimeRangeLimit[0]) &&
+          new Date(current) <= new Date(this.dateTimeRangeLimit[1])
+        ) {
+          return false;
+        }
+      }
+      return true;
     }
   },
   watch: {
@@ -286,7 +313,7 @@ export default {
         this.filtrate.timeSelect = "0";
       } else {
         this.filtrate.timeSelect = "10";
-        this.filtrate.times = [];
+        this.filtrate.times = this.dateTimeRangeLimit;
       }
     },
     autoRefresh(val) {
@@ -312,6 +339,7 @@ export default {
   async mounted() {
     await this.getAggregation();
     await this.search(1);
+    await this.getAllIndexTimes();
   }
 };
 </script>

@@ -24,6 +24,17 @@ namespace DotNetCore.ElementAdmin.Application.SystemLogs
             _logManager = logManager;
         }
 
+        public async Task<List<string>> GetAllIndexTimes()
+        {
+            var times = await _logManager.GetAllIndexTimes();
+            var orderTimes = times.OrderBy(x => x);
+            return new List<string>
+            {
+                orderTimes.FirstOrDefault().ToString("yyyy-MM-dd HH:mm"),
+                orderTimes.LastOrDefault().ToString("yyyy-MM-dd HH:mm")
+             };
+        }
+
         public async Task<Dictionary<string, object>> PostAggregation(LogFiltrateInputDto input)
         {
             var search = GetElasticsearchByInput(input);

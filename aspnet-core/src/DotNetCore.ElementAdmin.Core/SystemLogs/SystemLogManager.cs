@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System;
 using Flurl.Http;
 using System.Linq;
@@ -85,10 +86,29 @@ namespace DotNetCore.ElementAdmin.Core.SystemLogs
             return await ToSearchAsync(input);
         }
 
+        public async Task<List<DateTime>> GetAllIndexTimes()
+        {
+            var response = await $"{_elasticsearchPath}/_cat/indices?v".GetAsync();
+            var resStr = await response.Content.ReadAsStringAsync();
+            var arr = resStr.Split(new[] { "\r", "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+            return arr.Select(x =>
+            {
+                var a = x.Split("logstash-");
+                if (a.Length < 2) return DateTime.MinValue;
+                var time = a[1].Split(" ")[0];
+                if (DateTime.TryParse(time, out var r))
+                {
+                    return r;
+                }
+                return DateTime.MinValue;
+            })
+            .Where(x => x != DateTime.MinValue)
+            .ToList();
+        }
         private async Task<string> ToSearchAsync(Elasticsearch input)
         {
             var index = GetIndexs(input);
-            var request = input;
+            var request = input.ToJson();
             var url = $"{_elasticsearchPath}/{index}/logevent/_search";
             _log.LogInformation("Send {request} To {url}", new object[] { request, url });
 

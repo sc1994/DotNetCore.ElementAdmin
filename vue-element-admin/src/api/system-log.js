@@ -15,3 +15,10 @@ export function postSearch(data) {
     data
   })
 }
+
+export function getAllIndexTimes() {
+  return request({
+    url: "/services/app/Logs/GetAllIndexTimes",
+    method: 'get'
+  })
+}
