@@ -18,6 +18,9 @@ namespace DotNetCore.ElementAdmin.SystemLogs.Dto
         [JsonProperty("context")]
         public string[] Context { get; set; }
 
+        [JsonProperty("requestId")]
+        public string RequestId { get; set; }
+
         [JsonProperty("filter1")]
         public string Filter1 { get; set; }
 

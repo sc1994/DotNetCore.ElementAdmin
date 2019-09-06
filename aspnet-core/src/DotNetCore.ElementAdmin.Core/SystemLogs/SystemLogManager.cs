@@ -5,7 +5,6 @@ using Newtonsoft.Json;
 using Abp.Domain.Services;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Microsoft.AspNetCore.Hosting;
 using DotNetCore.ElementAdmin.SystemLogs.Elasticsearch;
 
 namespace DotNetCore.ElementAdmin.Core.SystemLogs
@@ -65,10 +64,19 @@ namespace DotNetCore.ElementAdmin.Core.SystemLogs
                     }
                 }
             }
+            var requestPaths = result.Aggregations["aggRequestPath"]
+                                     .Buckets
+                                     .Select(x =>
+                                     {
+                                         if (x.Key.StartsWith("/api/"))
+                                             x.Key = x.Key.Replace("/api/", ""); // 移除统一前缀
+                                         return x;
+                                     })
+                                     .ToArray();
             return (
                 null, // result.Aggregations["aggMessageTemplate"].Buckets, 暂不查询
                 result.Aggregations["aggSourceContext"].Buckets,
-                result.Aggregations["aggRequestPath"].Buckets
+                requestPaths
             );
         }
 
@@ -80,12 +88,13 @@ namespace DotNetCore.ElementAdmin.Core.SystemLogs
         private async Task<string> ToSearchAsync(Elasticsearch input)
         {
             var index = GetIndexs(input);
-            var request = input.ToJson();
+            var request = input;
             var url = $"{_elasticsearchPath}/{index}/logevent/_search";
+            _log.LogInformation("Send {request} To {url}", new object[] { request, url });
+
             var response = await $"{_elasticsearchPath}/{index}/logevent/_search"
                                     .WithHeader("Content-Type", "application/json")
                                     .PostStringAsync(input.ToJson());
-            _log.LogInformation("Send {request} To {url}", new object[] { request, url });
             return await response.Content.ReadAsStringAsync();
         }
 

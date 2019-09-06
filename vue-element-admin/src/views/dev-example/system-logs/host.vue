@@ -3,7 +3,7 @@
     <el-card class="box-card" shadow="hover" style>
       <el-row :gutter="5">
         <el-col :span="2">Request Path&nbsp;</el-col>
-        <el-col :span="10">
+        <el-col :span="9">
           <el-cascader
             :options="requestPath"
             clearable
@@ -21,7 +21,7 @@
             </template>
           </el-cascader>
         </el-col>
-        <el-col :span="1">Level</el-col>
+        <el-col :span="2">Level&nbsp;</el-col>
         <el-col :span="3">
           <el-select v-model="filtrate.lv" clearable placeholder="Select Level">
             <el-option label="Information" value="Information"></el-option>
@@ -31,7 +31,7 @@
             <el-option label="Fatal" value="Fatal"></el-option>
           </el-select>
         </el-col>
-        <el-col :span="2">Time Range</el-col>
+        <el-col :span="2">Time Range&nbsp;</el-col>
         <el-col :span="6">
           <el-date-picker
             v-if="switchTime"
@@ -55,24 +55,10 @@
         </el-col>
       </el-row>
       <br />
-      <!-- 
-        <el-col :span="1">过滤：</el-col>
-        <el-col :span="3">
-          <el-input v-model="filtrate.filter1" placeholder="过滤1"></el-input>
-        </el-col>
-        <el-col :span="4">
-          <el-input v-model="filtrate.filter2" placeholder="过滤2"></el-input>
-        </el-col>
-        <el-col :span="1">Ip：</el-col>
-        <el-col :span="3">
-          <el-select v-model="filtrate.ip" clearable style="width:100%">
-            <el-option v-for="item in ips" :key="item" :label="item" :value="item"></el-option>
-          </el-select>
-      </el-col>-->
 
       <el-row :gutter="5">
         <el-col :span="2">Context&nbsp;</el-col>
-        <el-col :span="10">
+        <el-col :span="9">
           <el-cascader
             :options="context"
             clearable
@@ -90,14 +76,16 @@
             </template>
           </el-cascader>
         </el-col>
-        <el-col :span="1">Search</el-col>
-        <el-col :span="10">
-          <el-input
-            v-model="filtrate.msg"
-            placeholder="This will disrupt the chronological order of the input based on how well it matches!Please strictly limit the time range, otherwise the search results will be more deviation"
-          ></el-input>
+        <el-col :span="2">RequestId&nbsp;</el-col>
+        <el-col :span="4">
+          <el-input v-model="filtrate.requestId" placeholder></el-input>
+        </el-col>
+        <el-col :span="1">Search&nbsp;</el-col>
+        <el-col :span="5">
+          <el-input v-model="filtrate.msg" placeholder></el-input>
         </el-col>
       </el-row>
+
       <br />
       <el-row :gutter="5">
         <el-button
@@ -127,32 +115,41 @@
     >
       >
       <el-table-column prop="timestamp" label="Time" width="165"></el-table-column>
-      <el-table-column prop="level" label="Level" width="110">
+      <el-table-column label="Level" width="110">
         <template slot-scope="scope">
           <span>{{scope.row.level}}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="RequestPath" label="RequestPath" width="280">
+      <el-table-column label="Request Path" width="320">
         <template slot-scope="scope">
-          <span class="span-long-text" :title="scope.row.RequestPath">{{scope.row.RequestPath}}</span>
+          <span
+            class="span-long-text"
+            :title="scope.row.fields.RequestPath"
+          >{{scope.row.fields.RequestPath}}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="module" label="Context" width="380">
+      <el-table-column prop="module" label="Context" width="400">
         <template slot-scope="scope">
-          <span class="span-long-text" :title="scope.row.SourceContext">{{scope.row.SourceContext}}</span>
+          <span
+            class="span-long-text"
+            :title="scope.row.fields.SourceContext"
+          >{{scope.row.fields.SourceContext}}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="message" label="Message">
+      <el-table-column prop="messageTemplate" label="Message Template">
         <template slot-scope="scope">
           <!-- <span
             class="span-long-text"
             v-if="scope.row['fields.msg'] && scope.row['fields.msg'][0]"
             v-html="scope.row['fields.msg'][0]"
           ></span> TODO:不知道干嘛的逻辑-->
-          <span class="span-long-text">{{scope.row.message}}</span>
+          <span
+            class="span-long-text"
+            :title="scope.row.messageTemplate"
+          >{{scope.row.messageTemplate}}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="RequestId" label="RequestId" width="220"></el-table-column>
+      <el-table-column prop="fields.RequestId" label="RequestId" width="220"></el-table-column>
     </el-table>
     <div style="padding: 20px;text-align: right">
       <el-pagination
@@ -168,35 +165,30 @@
     <br />
     <br />
     <el-dialog
-      :title="current.module+' / '+current.category+' / '+current.sub_category"
+      :title="current.fields && current.fields.SourceContext"
       :visible.sync="dialogVisible"
       width="60%"
       height="95%"
     >
       <el-table :data="[{...current}]" style="width: 100%">
-        <el-table-column prop="timestamp" label="时间戳"></el-table-column>
-        <el-table-column prop="app" label="项目"></el-table-column>
-        <el-table-column prop="level" label="等级"></el-table-column>
-        <el-table-column prop="filter1" label="过滤1" v-if="current.filter1"></el-table-column>
-        <el-table-column prop="filter2" label="过滤2" v-if="current.filter2"></el-table-column>
+        <el-table-column prop="timestamp" label="Time" width="180"></el-table-column>
+        <el-table-column prop="level" label="Level" width="180"></el-table-column>
+        <el-table-column prop="fields.SourceContext" label="Context"></el-table-column>
+        <el-table-column prop="messageTemplate" label="Message Template"></el-table-column>
       </el-table>
       <div v-if="current['fields.msg']">
         <el-divider content-position="left">含有关键字片段</el-divider>
         <p v-for="item in current['fields.msg']" :key="item" v-html="item"></p>
       </div>
       <br />
-      <el-input
-        type="textarea"
-        :autosize="{ minRows: 1, maxRows: 25 }"
-        :value="toJsonFormat(current.msg)"
-        spellcheck="true"
-      ></el-input>
+      <json-editor ref="jsonEditor" :value="{...current}" :readonly="true" :lineNumber="false" />
     </el-dialog>
   </div>
 </template>
 <script>
 import { postAggregation, postSearch } from "@/api/system-log";
 import { parseTime } from "@/utils";
+import JsonEditor from "@/components/JsonEditor";
 
 export default {
   data() {
@@ -220,6 +212,7 @@ export default {
       loading: false
     };
   },
+  components: { JsonEditor },
   methods: {
     async search(pageIndex) {
       this.currentPage = pageIndex;
@@ -230,16 +223,15 @@ export default {
         pageIndex
       });
       var content = JSON.parse(result);
-      console.log(content);
+
       this.tableData = content.hits.hits.map(x => {
         return {
+          ...x._source,
           timestamp: parseTime(x._source["@timestamp"]),
-          level: x._source.level,
-          message: x._source.message,
-          ...x._source.fields,
           ...x.highlight
         };
       });
+      console.log(this.tableData);
       this.total = content.hits.total;
       this.loading = false;
     },
@@ -251,7 +243,11 @@ export default {
     tableRowClassName({ row }) {
       if (row.level === "Warning") {
         return "warning-row";
-      } else if (row.level === "Error" || row.level == "Fatal") {
+      } else if (
+        row.level === "Error" ||
+        row.level == "Fatal" ||
+        row.fields.StatusCode == 500
+      ) {
         return "error-row";
       }
       return "";
@@ -302,9 +298,7 @@ export default {
         window.clearInterval(this.timer);
       }
     },
-    dialogVisible() {
-      $("textarea").scrollTop(0);
-    },
+    dialogVisible() {},
     "filtrate.timeSelect"(val) {
       if (val > 0) this.getAggregation();
     },

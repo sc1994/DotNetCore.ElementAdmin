@@ -152,6 +152,8 @@ namespace DotNetCore.ElementAdmin.SystemLogs.Elasticsearch
         public string FieldsIpKeyword { get; set; }
         [JsonProperty("fields.app.keyword", NullValueHandling = NullValueHandling.Ignore)]
         public string FieldsAppKeyword { get; set; }
+        [JsonProperty("fields.RequestId.keyword", NullValueHandling = NullValueHandling.Ignore)]
+        public string FieldsRequestIdKeyword { get; set; }
     }
 
     public class ElasticsearchHighlightFields

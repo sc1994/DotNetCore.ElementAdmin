@@ -28,6 +28,14 @@ namespace DotNetCore.ElementAdmin.Application.SystemLogs
         {
             var search = GetElasticsearchByInput(input);
 
+            search.Query.Bool.Must.Add(new ElasticsearchMust // 只查看 api 屏蔽 类型以swagger的静态资源访问日志
+            {
+                Prefix = new ElasticsearchPrefix
+                {
+                    FieldsRequestPathKeyword = $"/api/"
+                }
+            });
+
             // 添加内容聚合
             search.Aggs.Add("aggSourceContext", new ElasticsearchAggs
             {
@@ -76,7 +84,7 @@ namespace DotNetCore.ElementAdmin.Application.SystemLogs
                 {
                     Prefix = new ElasticsearchPrefix
                     {
-                        FieldsRequestPathKeyword = $"/{string.Join("/", input.RequestPath.Where(x => !string.IsNullOrWhiteSpace(x)))}"
+                        FieldsRequestPathKeyword = $"/api/{string.Join("/", input.RequestPath.Where(x => !string.IsNullOrWhiteSpace(x)))}"
                     }
                 });
             }
@@ -91,6 +99,16 @@ namespace DotNetCore.ElementAdmin.Application.SystemLogs
                     }
                 });
             }
+            search.Sort = new[]
+            {
+                new ElasticsearchSort
+                {
+                    Timestamp = new ElasticsearchTimestamp
+                    {
+                        Order = "DESC"
+                    }
+                }
+            };
             return await _logManager.GetSearch(search);
         }
 
@@ -136,6 +154,10 @@ namespace DotNetCore.ElementAdmin.Application.SystemLogs
                     }
                 });
             }
+            else
+            {
+                throw new Exception("plase select time range");
+            }
             if (!string.IsNullOrWhiteSpace(input.Lv))
             {
                 search.Query.Bool.Must.Add(new ElasticsearchMust
@@ -147,17 +169,16 @@ namespace DotNetCore.ElementAdmin.Application.SystemLogs
                 });
             }
 
-            search.Query.Bool.Must.Add(new ElasticsearchMust
+            if (!string.IsNullOrWhiteSpace(input.RequestId))
             {
-                Range = new ElasticsearchRange
+                search.Query.Bool.Must.Add(new ElasticsearchMust
                 {
-                    Timestamp = new ElasticsearchTimestamp
+                    Term = new ElasticsearchTerm
                     {
-                        Gt = start,
-                        Lt = end
+                        FieldsRequestIdKeyword = input.RequestId
                     }
-                }
-            });
+                });
+            }
 
             return search;
         }
