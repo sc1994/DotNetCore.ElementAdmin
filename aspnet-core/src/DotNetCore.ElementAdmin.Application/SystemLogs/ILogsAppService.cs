@@ -2,7 +2,6 @@ using System.Threading.Tasks;
 using Abp.Application.Services;
 using System.Collections.Generic;
 using DotNetCore.ElementAdmin.SystemLogs.Dto;
-using System;
 
 namespace DotNetCore.ElementAdmin.Application.SystemLogs
 {

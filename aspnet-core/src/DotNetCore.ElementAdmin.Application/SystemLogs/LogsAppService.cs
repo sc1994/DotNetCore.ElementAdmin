@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -31,7 +32,7 @@ namespace DotNetCore.ElementAdmin.Application.SystemLogs
             return new List<string>
             {
                 orderTimes.FirstOrDefault().ToString("yyyy-MM-dd HH:mm"),
-                orderTimes.LastOrDefault().ToString("yyyy-MM-dd HH:mm")
+                orderTimes.LastOrDefault().ToString("yyyy-MM-dd") +" 23:59"
              };
         }
 

@@ -183,7 +183,7 @@
         <p v-for="item in current['fields.msg']" :key="item" v-html="item"></p>
       </div>
       <br />
-      <json-editor ref="jsonEditor" :value="{...current}" :readonly="true" :lineNumber="false" />
+      <json-editor ref="jsonEditor" :value="jsonModel" :readonly="true" :lineNumber="false" />
     </el-dialog>
   </div>
 </template>
@@ -195,6 +195,8 @@ import {
 } from "@/api/system-log";
 import { parseTime } from "@/utils";
 import JsonEditor from "@/components/JsonEditor";
+import { type } from "os";
+const regQuote = /^["|'](.*)["|']$/g;
 
 export default {
   data() {
@@ -223,6 +225,14 @@ export default {
     };
   },
   components: { JsonEditor },
+  computed: {
+    jsonModel() {
+      let result = { ...this.current };
+      console.log(result);
+      // TODO:特殊处理
+      return result;
+    }
+  },
   methods: {
     async search(pageIndex) {
       this.currentPage = pageIndex;
@@ -293,7 +303,6 @@ export default {
       var { result } = await getAllIndexTimes();
       console.log(result);
       this.dateTimeRangeLimit = result;
-      this.filtrate.times = [...this.dateTimeRangeLimit];
     },
     disabledDate(current) {
       if (this.dateTimeRangeLimit.length == 2) {
@@ -311,9 +320,10 @@ export default {
     switchTime(val) {
       if (val) {
         this.filtrate.timeSelect = "0";
+        this.filtrate.times = this.dateTimeRangeLimit;
       } else {
         this.filtrate.timeSelect = "10";
-        this.filtrate.times = this.dateTimeRangeLimit;
+        this.filtrate.times = [];
       }
     },
     autoRefresh(val) {
@@ -325,7 +335,6 @@ export default {
         window.clearInterval(this.timer);
       }
     },
-    dialogVisible() {},
     "filtrate.timeSelect"(val) {
       if (val > 0) this.getAggregation();
     },
